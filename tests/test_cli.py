@@ -11,6 +11,7 @@ from riscos_dumpsprites.cli import (
     build_details,
     build_json,
     build_summary,
+    parse_sprite_mode,
     parse_sprite_file,
 )
 
@@ -33,11 +34,13 @@ class SpriteParserTests(unittest.TestCase):
         self.assertEqual(first.mode.pixel_width, 640)
         self.assertEqual(first.mode.pixel_height, 480)
         self.assertEqual(first.mode.logical_colours, 16)
+        self.assertEqual(first.mode.mask_kind, "1bpp")
 
         summary = build_summary(sprite_file)
         self.assertIn("tile_1r", summary)
         self.assertIn("32x16", summary)
         self.assertIn("old", summary)
+        self.assertIn("1bpp", summary)
         self.assertIn("27 640x480", summary)
 
     def test_details_for_new_format_sprite(self) -> None:
@@ -58,6 +61,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertTrue(alpha_sprite.mode.has_alpha)
         self.assertEqual(alpha_sprite.mode.bpp, 8)
         self.assertEqual(alpha_sprite.mode.mask_bpp, 8)
+        self.assertEqual(alpha_sprite.mode.mask_kind, "alpha")
         self.assertEqual(alpha_sprite.width_pixels, 32)
         self.assertEqual(alpha_sprite.palette_entries, 256)
 
@@ -80,9 +84,28 @@ class SpriteParserTests(unittest.TestCase):
 
         payload = json.loads(build_json(sprite_file, "tile_1r"))
         self.assertEqual(payload["mode"]["mode_number"], 27)
+        self.assertEqual(payload["mode"]["base_mode_number"], 27)
         self.assertEqual(payload["mode"]["kind"], "graphics")
         self.assertEqual(payload["mode"]["logical_colours"], 16)
+        self.assertEqual(payload["mode"]["memory_kb"], 150)
+        self.assertEqual(payload["mode"]["refresh_hz"], 60)
+        self.assertEqual(payload["mode"]["monitor_types"], [1, 3, 4, 5])
+        self.assertEqual(payload["mode"]["mask_kind"], "1bpp")
         self.assertEqual(payload["mode"]["pixel_resolution"], {"width": 640, "height": 480})
+
+    def test_shadow_old_mode_and_cmyk_mode_metadata(self) -> None:
+        shadow_mode = parse_sprite_mode(27 | 0x80)
+        self.assertEqual(shadow_mode.mode_number, 155)
+        self.assertEqual(shadow_mode.base_mode_number, 27)
+        self.assertTrue(shadow_mode.shadow_mode)
+        self.assertEqual(shadow_mode.memory_kb, 150)
+        self.assertEqual(shadow_mode.refresh_hz, 60)
+
+        cmyk_mode = parse_sprite_mode((7 << 27) | (90 << 1) | (90 << 14))
+        self.assertEqual(cmyk_mode.data_format, "CMYK")
+        self.assertEqual(cmyk_mode.colour_model, "CMYK")
+        self.assertEqual(cmyk_mode.mask_kind, "1bpp")
+        self.assertFalse(cmyk_mode.has_alpha)
 
     def test_check_report_ok_for_valid_sample(self) -> None:
         sprite_file = parse_sprite_file(ROOT / "sprites" / "wavytile,ff9")

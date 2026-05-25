@@ -12,52 +12,52 @@ FILE_HEADER_SIZE = 12
 SPRITE_HEADER_SIZE = 44
 
 OLD_MODE_INFO = {
-    0: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
-    1: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
-    2: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics"},
-    3: {"text": (80, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text"},
-    4: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
-    5: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics"},
-    6: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text"},
-    7: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 16, "kind": "teletext"},
-    8: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
-    9: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
-    10: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics"},
-    11: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 4, "kind": "graphics"},
-    12: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
-    13: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
-    14: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 16, "kind": "graphics"},
-    15: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
-    16: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 16, "kind": "graphics"},
-    17: {"text": (132, 25), "pixel": (1056, 250), "os_units": (2112, 1000), "logical_colours": 16, "kind": "graphics"},
-    18: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 2, "kind": "graphics"},
-    19: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics"},
-    20: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics"},
-    21: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics"},
-    22: {"text": (96, 36), "pixel": (768, 288), "os_units": (768, 576), "logical_colours": 16, "kind": "graphics"},
-    23: {"text": (144, 56), "pixel": (1152, 896), "os_units": (2304, 1792), "logical_colours": 2, "kind": "graphics"},
-    24: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 256, "kind": "graphics"},
-    25: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 2, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
-    26: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 4, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
-    27: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 16, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
-    28: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 256, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
-    29: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 2, "kind": "graphics"},
-    30: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 4, "kind": "graphics"},
-    31: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 16, "kind": "graphics"},
-    33: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 2, "kind": "graphics"},
-    34: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 4, "kind": "graphics"},
-    35: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 16, "kind": "graphics"},
-    36: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 256, "kind": "graphics"},
-    37: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 2, "kind": "graphics"},
-    38: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 4, "kind": "graphics"},
-    39: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 16, "kind": "graphics"},
-    40: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 256, "kind": "graphics"},
-    41: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 2, "kind": "graphics"},
-    42: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 4, "kind": "graphics"},
-    43: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 16, "kind": "graphics"},
-    44: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 2, "kind": "graphics"},
-    45: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 4, "kind": "graphics"},
-    46: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 16, "kind": "graphics"},
+    0: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    1: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    2: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    3: {"text": (80, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    4: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    5: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    6: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    7: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 16, "kind": "teletext", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    8: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    9: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    10: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    11: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 4, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    12: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    13: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    14: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 16, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    15: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 160, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    16: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 16, "kind": "graphics", "memory_kb": 132, "hz": 50, "monitors": (0, 1)},
+    17: {"text": (132, 25), "pixel": (1056, 250), "os_units": (2112, 1000), "logical_colours": 16, "kind": "graphics", "memory_kb": 132, "hz": 50, "monitors": (0, 1)},
+    18: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 2, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (1,)},
+    19: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (1,)},
+    20: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics", "memory_kb": 160, "hz": 50, "monitors": (1,)},
+    21: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics", "memory_kb": 320, "hz": 50, "monitors": (1,)},
+    22: {"text": (96, 36), "pixel": (768, 288), "os_units": (768, 576), "logical_colours": 16, "kind": "graphics", "memory_kb": 108, "hz": 50, "monitors": (0, 1)},
+    23: {"text": (144, 56), "pixel": (1152, 896), "os_units": (2304, 1792), "logical_colours": 2, "kind": "graphics", "memory_kb": 126, "hz": 64, "monitors": (2,)},
+    24: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 256, "kind": "graphics", "memory_kb": 264, "hz": 50, "monitors": (0, 1)},
+    25: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 2, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 38, "hz": 60, "monitors": (1, 3, 4, 5)},
+    26: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 4, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 75, "hz": 60, "monitors": (1, 3, 4, 5)},
+    27: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 16, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 150, "hz": 60, "monitors": (1, 3, 4, 5)},
+    28: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 256, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 300, "hz": 60, "monitors": (1, 3, 4, 5)},
+    29: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 2, "kind": "graphics", "memory_kb": 59, "hz": 56, "monitors": (1, 4)},
+    30: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 4, "kind": "graphics", "memory_kb": 117, "hz": 56, "monitors": (1, 4)},
+    31: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 16, "kind": "graphics", "memory_kb": 234, "hz": 56, "monitors": (1, 4)},
+    33: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 2, "kind": "graphics", "memory_kb": 27, "hz": 50, "monitors": (0, 1)},
+    34: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 4, "kind": "graphics", "memory_kb": 54, "hz": 50, "monitors": (0, 1)},
+    35: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 16, "kind": "graphics", "memory_kb": 108, "hz": 50, "monitors": (0, 1)},
+    36: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 256, "kind": "graphics", "memory_kb": 216, "hz": 50, "monitors": (0, 1)},
+    37: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 2, "kind": "graphics", "memory_kb": 39, "hz": 60, "monitors": (1,)},
+    38: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 4, "kind": "graphics", "memory_kb": 77, "hz": 60, "monitors": (1,)},
+    39: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 16, "kind": "graphics", "memory_kb": 154, "hz": 60, "monitors": (1,)},
+    40: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 256, "kind": "graphics", "memory_kb": 308, "hz": 60, "monitors": (1,)},
+    41: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 2, "kind": "graphics", "memory_kb": 28, "hz": 60, "monitors": (1, 3, 4, 5)},
+    42: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 4, "kind": "graphics", "memory_kb": 55, "hz": 60, "monitors": (1, 3, 4, 5)},
+    43: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 16, "kind": "graphics", "memory_kb": 110, "hz": 60, "monitors": (1, 3, 4, 5)},
+    44: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 2, "kind": "graphics", "memory_kb": 16, "hz": 60, "monitors": (1, 3, 4, 5)},
+    45: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 4, "kind": "graphics", "memory_kb": 31, "hz": 60, "monitors": (1, 3, 4, 5)},
+    46: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 16, "kind": "graphics", "memory_kb": 63, "hz": 60, "monitors": (1, 3, 4, 5)},
 }
 
 NEW_SPRITE_TYPES = {
@@ -81,11 +81,14 @@ class SpriteMode:
     format_name: str
     raw_value: int
     mode_number: int | None
+    base_mode_number: int | None
+    shadow_mode: bool
     sprite_type: int
     has_alpha: bool
     kind: str | None
     bpp: int | None
     mask_bpp: int | None
+    mask_kind: str | None
     logical_colours: int | None
     text_columns: int | None
     text_rows: int | None
@@ -93,9 +96,13 @@ class SpriteMode:
     pixel_height: int | None
     os_unit_width: int | None
     os_unit_height: int | None
+    memory_kb: int | None
+    refresh_hz: int | None
+    monitor_types: tuple[int, ...]
     x_dpi: int | None
     y_dpi: int | None
     data_format: str | None
+    colour_model: str | None
     description: str
 
 
@@ -146,7 +153,9 @@ class SpriteFile:
 def parse_sprite_mode(raw_mode: int) -> SpriteMode:
     sprite_type = raw_mode >> 27
     if sprite_type == 0:
-        mode_info = OLD_MODE_INFO.get(raw_mode, {})
+        shadow_mode = bool(raw_mode & 0x80)
+        base_mode = raw_mode & 0x7F
+        mode_info = OLD_MODE_INFO.get(base_mode, {})
         bpp = infer_bpp_from_logical_colours(mode_info.get("logical_colours"))
         x_dpi = mode_info.get("x_dpi")
         y_dpi = mode_info.get("y_dpi")
@@ -154,20 +163,25 @@ def parse_sprite_mode(raw_mode: int) -> SpriteMode:
         logical_colours = mode_info.get("logical_colours")
         if pixel and logical_colours:
             description = (
-                f"old format, mode {raw_mode}, {pixel[0]}x{pixel[1]} pixels, "
+                f"old format, mode {base_mode}, {pixel[0]}x{pixel[1]} pixels, "
                 f"{logical_colours} logical colours"
             )
         else:
-            description = f"old format, mode {raw_mode}"
+            description = f"old format, mode {base_mode}"
+        if shadow_mode:
+            description += ", shadow screen"
         return SpriteMode(
             format_name="old",
             raw_value=raw_mode,
             mode_number=raw_mode,
+            base_mode_number=base_mode,
+            shadow_mode=shadow_mode,
             sprite_type=0,
             has_alpha=False,
             kind=mode_info.get("kind"),
             bpp=bpp,
-            mask_bpp=bpp,
+            mask_bpp=1,
+            mask_kind="1bpp" if bpp is not None else None,
             logical_colours=logical_colours,
             text_columns=tuple_or_none(mode_info.get("text"), 0),
             text_rows=tuple_or_none(mode_info.get("text"), 1),
@@ -175,9 +189,13 @@ def parse_sprite_mode(raw_mode: int) -> SpriteMode:
             pixel_height=tuple_or_none(pixel, 1),
             os_unit_width=tuple_or_none(mode_info.get("os_units"), 0),
             os_unit_height=tuple_or_none(mode_info.get("os_units"), 1),
+            memory_kb=mode_info.get("memory_kb"),
+            refresh_hz=mode_info.get("hz"),
+            monitor_types=mode_info.get("monitors", ()),
             x_dpi=x_dpi,
             y_dpi=y_dpi,
             data_format="indexed",
+            colour_model="indexed",
             description=description,
         )
 
@@ -195,11 +213,14 @@ def parse_sprite_mode(raw_mode: int) -> SpriteMode:
         format_name="new",
         raw_value=raw_mode,
         mode_number=None,
+        base_mode_number=None,
+        shadow_mode=False,
         sprite_type=sprite_type,
         has_alpha=has_alpha,
         kind="graphics",
         bpp=type_info.get("bpp"),
         mask_bpp=8 if has_alpha else type_info.get("mask_bpp"),
+        mask_kind="alpha" if has_alpha else "1bpp",
         logical_colours=None,
         text_columns=None,
         text_rows=None,
@@ -207,9 +228,13 @@ def parse_sprite_mode(raw_mode: int) -> SpriteMode:
         pixel_height=None,
         os_unit_width=None,
         os_unit_height=None,
+        memory_kb=None,
+        refresh_hz=None,
+        monitor_types=(),
         x_dpi=x_dpi,
         y_dpi=y_dpi,
         data_format=type_info.get("data_format"),
+        colour_model=type_info.get("data_format"),
         description=description,
     )
 
@@ -499,7 +524,7 @@ def build_summary(sprite_file: SpriteFile) -> str:
         size = unknown_or(f"{sprite.width_pixels}x{sprite.height}", sprite.width_pixels)
         sprite_type = summary_type(sprite.mode)
         bpp = unknown_or(str(sprite.mode.bpp), sprite.mode.bpp)
-        mask = "yes" if sprite.has_mask else "no"
+        mask = summary_mask(sprite)
         palette = str(sprite.palette_entries)
         mode = summary_mode(sprite.mode)
         rows.append([sprite.name, size, sprite_type, bpp, mask, palette, mode])
@@ -532,19 +557,33 @@ def build_details(sprite_file: SpriteFile, sprite_name: str) -> str:
         f"Mode description: {sprite.mode.description}",
         f"Mode raw value: 0x{sprite.mode.raw_value:08x}",
         f"Mode number: {unknown_or(str(sprite.mode.mode_number), sprite.mode.mode_number)}",
+        f"Base mode number: {unknown_or(str(sprite.mode.base_mode_number), sprite.mode.base_mode_number)}",
+        f"Shadow mode: {'yes' if sprite.mode.shadow_mode else 'no'}",
         f"Sprite type: {sprite.mode.sprite_type}",
         f"Alpha channel: {'yes' if sprite.mode.has_alpha else 'no'}",
         f"Mode kind: {unknown_or(sprite.mode.kind, sprite.mode.kind)}",
         f"Bits per pixel: {unknown_or(str(sprite.mode.bpp), sprite.mode.bpp)}",
+        f"Mask kind: {unknown_or(sprite.mode.mask_kind, sprite.mode.mask_kind)}",
         f"Logical colours: {unknown_or(str(sprite.mode.logical_colours), sprite.mode.logical_colours)}",
         f"Text resolution: {format_pair(sprite.mode.text_columns, sprite.mode.text_rows)}",
         f"Mode pixel resolution: {format_pair(sprite.mode.pixel_width, sprite.mode.pixel_height)}",
         f"Mode OS units: {format_pair(sprite.mode.os_unit_width, sprite.mode.os_unit_height)}",
+        f"Mode memory: {format_memory_kb(sprite.mode.memory_kb)}",
+        f"Mode refresh: {format_hz(sprite.mode.refresh_hz)}",
+        f"Supported monitors: {format_monitors(sprite.mode.monitor_types)}",
         f"Mask bits per pixel: {unknown_or(str(sprite.mode.mask_bpp), sprite.mode.mask_bpp)}",
         f"Horizontal dpi: {unknown_or(str(sprite.mode.x_dpi), sprite.mode.x_dpi)}",
         f"Vertical dpi: {unknown_or(str(sprite.mode.y_dpi), sprite.mode.y_dpi)}",
         f"Data format: {unknown_or(sprite.mode.data_format, sprite.mode.data_format)}",
+        f"Colour model: {unknown_or(sprite.mode.colour_model, sprite.mode.colour_model)}",
     ]
+    if sprite.mode.data_format == "CMYK":
+        lines.extend(
+            [
+                "CMYK channels: 8 bits each",
+                "CMYK byte order: cyan, magenta, yellow, black",
+            ]
+        )
     lines.extend(build_palette_lines(sprite))
     lines.extend(build_warning_lines(sprite.warnings))
     return "\n".join(lines)
@@ -622,6 +661,12 @@ def summary_type(mode: SpriteMode) -> str:
     return label
 
 
+def summary_mask(sprite: Sprite) -> str:
+    if not sprite.has_mask:
+        return "none"
+    return sprite.mode.mask_kind or "yes"
+
+
 def unknown_or(value: str, present: object | None) -> str:
     return value if present is not None else "unknown"
 
@@ -630,6 +675,24 @@ def format_pair(first: int | None, second: int | None) -> str:
     if first is None or second is None:
         return "unknown"
     return f"{first} x {second}"
+
+
+def format_memory_kb(value: int | None) -> str:
+    if value is None:
+        return "unknown"
+    return f"{value}K"
+
+
+def format_hz(value: int | None) -> str:
+    if value is None:
+        return "unknown"
+    return f"{value} Hz"
+
+
+def format_monitors(monitors: tuple[int, ...]) -> str:
+    if not monitors:
+        return "unknown"
+    return ", ".join(str(monitor) for monitor in monitors)
 
 
 def collect_warnings(sprite_file: SpriteFile) -> list[str]:
@@ -644,11 +707,14 @@ def sprite_mode_to_dict(mode: SpriteMode) -> dict[str, object]:
         "format": mode.format_name,
         "raw_value": mode.raw_value,
         "mode_number": mode.mode_number,
+        "base_mode_number": mode.base_mode_number,
+        "shadow_mode": mode.shadow_mode,
         "sprite_type": mode.sprite_type,
         "has_alpha": mode.has_alpha,
         "kind": mode.kind,
         "bits_per_pixel": mode.bpp,
         "mask_bits_per_pixel": mode.mask_bpp,
+        "mask_kind": mode.mask_kind,
         "logical_colours": mode.logical_colours,
         "text_resolution": {
             "columns": mode.text_columns,
@@ -662,9 +728,13 @@ def sprite_mode_to_dict(mode: SpriteMode) -> dict[str, object]:
             "width": mode.os_unit_width,
             "height": mode.os_unit_height,
         },
+        "memory_kb": mode.memory_kb,
+        "refresh_hz": mode.refresh_hz,
+        "monitor_types": list(mode.monitor_types),
         "horizontal_dpi": mode.x_dpi,
         "vertical_dpi": mode.y_dpi,
         "data_format": mode.data_format,
+        "colour_model": mode.colour_model,
         "description": mode.description,
     }
 
