@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import json
 import struct
 import sys
@@ -148,6 +149,12 @@ class SpriteFile:
     extension_words: tuple[int, ...]
     sprites: tuple[Sprite, ...]
     warnings: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class SpriteSelection:
+    sprite_file: SpriteFile
+    sprites: tuple[Sprite, ...]
 
 
 def parse_sprite_mode(raw_mode: int) -> SpriteMode:
@@ -508,35 +515,26 @@ def expected_palette_entry_counts(mode: SpriteMode) -> set[int]:
     return {0}
 
 
-def build_summary(sprite_file: SpriteFile) -> str:
+def build_summary(selection: SpriteSelection, verbose: bool = False) -> str:
+    sprite_file = selection.sprite_file
     rows = [
-        [
-            "Name",
-            "Size",
-            "Type",
-            "BPP",
-            "Mask",
-            "Palette",
-            "Mode",
-        ]
+        summary_headers(verbose)
     ]
-    for sprite in sprite_file.sprites:
-        size = unknown_or(f"{sprite.width_pixels}x{sprite.height}", sprite.width_pixels)
-        sprite_type = summary_type(sprite.mode)
-        bpp = unknown_or(str(sprite.mode.bpp), sprite.mode.bpp)
-        mask = summary_mask(sprite)
-        palette = str(sprite.palette_entries)
-        mode = summary_mode(sprite.mode)
-        rows.append([sprite.name, size, sprite_type, bpp, mask, palette, mode])
+    for sprite in selection.sprites:
+        rows.append(summary_row(sprite, verbose))
 
     widths = [max(len(row[index]) for row in rows) for index in range(len(rows[0]))]
-    return "\n".join(
+    table = "\n".join(
         "  ".join(value.ljust(widths[index]) for index, value in enumerate(row)) for row in rows
     )
+    if verbose:
+        return f"File: {sprite_file.path}\nSprites shown: {len(selection.sprites)} of {sprite_file.sprite_count}\n{table}"
+    return table
 
 
-def build_details(sprite_file: SpriteFile, sprite_name: str) -> str:
-    sprite = find_sprite(sprite_file, sprite_name)
+def build_details(selection: SpriteSelection, sprite_name: str, verbose: bool = False) -> str:
+    sprite_file = selection.sprite_file
+    sprite = find_sprite(selection.sprites, sprite_name)
     lines = [
         f"File: {sprite_file.path}",
         f"Sprite: {sprite.name}",
@@ -584,12 +582,21 @@ def build_details(sprite_file: SpriteFile, sprite_name: str) -> str:
                 "CMYK byte order: cyan, magenta, yellow, black",
             ]
         )
-    lines.extend(build_palette_lines(sprite))
+    lines.extend(build_palette_lines(sprite, verbose=verbose))
+    if verbose:
+        lines.extend(
+            [
+                f"File sprite count: {sprite_file.sprite_count}",
+                f"File first sprite offset: 0x{sprite_file.first_sprite_offset:x}",
+                f"File free offset: 0x{sprite_file.free_offset:x}",
+                f"File extension words: {format_extension_words(sprite_file.extension_words)}",
+            ]
+        )
     lines.extend(build_warning_lines(sprite.warnings))
     return "\n".join(lines)
 
 
-def build_palette_lines(sprite: Sprite) -> list[str]:
+def build_palette_lines(sprite: Sprite, verbose: bool = False) -> list[str]:
     lines = [
         f"Palette entries decoded: {len(sprite.palette)}",
     ]
@@ -597,7 +604,7 @@ def build_palette_lines(sprite: Sprite) -> list[str]:
         return lines
 
     lines.append("Palette preview:")
-    preview_count = min(len(sprite.palette), 16)
+    preview_count = len(sprite.palette) if verbose else min(len(sprite.palette), 16)
     for entry in sprite.palette[:preview_count]:
         lines.append(
             "  "
@@ -618,28 +625,33 @@ def build_warning_lines(warnings: tuple[str, ...]) -> list[str]:
     return lines
 
 
-def build_check_report(sprite_file: SpriteFile) -> str:
-    warnings = collect_warnings(sprite_file)
+def build_check_report(selection: SpriteSelection, verbose: bool = False) -> str:
+    sprite_file = selection.sprite_file
+    warnings = collect_warnings(selection)
     if not warnings:
-        return f"{sprite_file.path}: OK"
+        suffix = f" ({len(selection.sprites)} of {sprite_file.sprite_count} sprites checked)" if verbose else ""
+        return f"{sprite_file.path}: OK{suffix}"
     lines = [f"{sprite_file.path}: {len(warnings)} warning(s)"]
+    if verbose:
+        lines.append(f"Sprites checked: {len(selection.sprites)} of {sprite_file.sprite_count}")
     lines.extend(warnings)
     return "\n".join(lines)
 
 
-def build_json(sprite_file: SpriteFile, sprite_name: str | None = None) -> str:
+def build_json(selection: SpriteSelection, sprite_name: str | None = None) -> str:
+    sprite_file = selection.sprite_file
     if sprite_name:
-        payload = sprite_to_dict(find_sprite(sprite_file, sprite_name))
+        payload = sprite_to_dict(find_sprite(selection.sprites, sprite_name))
     else:
-        payload = sprite_file_to_dict(sprite_file)
+        payload = sprite_file_to_dict(sprite_file, selection.sprites)
     return json.dumps(payload, indent=2)
 
 
-def find_sprite(sprite_file: SpriteFile, sprite_name: str) -> Sprite:
-    for sprite in sprite_file.sprites:
+def find_sprite(sprites: tuple[Sprite, ...], sprite_name: str) -> Sprite:
+    for sprite in sprites:
         if sprite.name == sprite_name:
             return sprite
-    available = ", ".join(sprite.name for sprite in sprite_file.sprites)
+    available = ", ".join(sprite.name for sprite in sprites)
     raise SpriteFormatError(f"sprite '{sprite_name}' not found; available sprites: {available}")
 
 
@@ -695,9 +707,9 @@ def format_monitors(monitors: tuple[int, ...]) -> str:
     return ", ".join(str(monitor) for monitor in monitors)
 
 
-def collect_warnings(sprite_file: SpriteFile) -> list[str]:
-    warnings = list(sprite_file.warnings)
-    for sprite in sprite_file.sprites:
+def collect_warnings(selection: SpriteSelection) -> list[str]:
+    warnings = list(selection.sprite_file.warnings)
+    for sprite in selection.sprites:
         warnings.extend(sprite.warnings)
     return warnings
 
@@ -776,16 +788,108 @@ def sprite_to_dict(sprite: Sprite) -> dict[str, object]:
     }
 
 
-def sprite_file_to_dict(sprite_file: SpriteFile) -> dict[str, object]:
+def sprite_file_to_dict(sprite_file: SpriteFile, sprites: tuple[Sprite, ...]) -> dict[str, object]:
     return {
         "path": str(sprite_file.path),
         "sprite_count": sprite_file.sprite_count,
+        "filtered_sprite_count": len(sprites),
         "first_sprite_offset": sprite_file.first_sprite_offset,
         "free_offset": sprite_file.free_offset,
         "extension_words": list(sprite_file.extension_words),
         "warnings": list(sprite_file.warnings),
-        "sprites": [sprite_to_dict(sprite) for sprite in sprite_file.sprites],
+        "sprites": [sprite_to_dict(sprite) for sprite in sprites],
     }
+
+
+def summary_headers(verbose: bool) -> list[str]:
+    if not verbose:
+        return ["Name", "Size", "Type", "BPP", "Mask", "Palette", "Mode"]
+    return [
+        "Name",
+        "Size",
+        "Type",
+        "BPP",
+        "Mask",
+        "Palette",
+        "Image",
+        "MaskBytes",
+        "Colour",
+        "Mode",
+    ]
+
+
+def summary_row(sprite: Sprite, verbose: bool) -> list[str]:
+    row = [
+        sprite.name,
+        unknown_or(f"{sprite.width_pixels}x{sprite.height}", sprite.width_pixels),
+        summary_type(sprite.mode),
+        unknown_or(str(sprite.mode.bpp), sprite.mode.bpp),
+        summary_mask(sprite),
+        str(sprite.palette_entries),
+    ]
+    if verbose:
+        row.extend(
+            [
+                str(sprite.image_bytes),
+                str(sprite.mask_bytes),
+                unknown_or(sprite.mode.colour_model, sprite.mode.colour_model),
+                summary_mode(sprite.mode),
+            ]
+        )
+        return row
+    row.append(summary_mode(sprite.mode))
+    return row
+
+
+def format_extension_words(words: tuple[int, ...]) -> str:
+    if not words:
+        return "none"
+    return ", ".join(f"0x{word:08x}" for word in words)
+
+
+def select_sprites(
+    sprite_file: SpriteFile,
+    *,
+    name_pattern: str | None = None,
+    mode_filter: str | None = None,
+    type_filter: str | None = None,
+    has_mask: bool = False,
+) -> SpriteSelection:
+    sprites = list(sprite_file.sprites)
+    if name_pattern:
+        sprites = [sprite for sprite in sprites if fnmatch.fnmatch(sprite.name, name_pattern)]
+    if mode_filter:
+        sprites = [sprite for sprite in sprites if sprite_matches_mode_filter(sprite, mode_filter)]
+    if type_filter:
+        sprites = [sprite for sprite in sprites if sprite_matches_type_filter(sprite, type_filter)]
+    if has_mask:
+        sprites = [sprite for sprite in sprites if sprite.has_mask]
+    return SpriteSelection(sprite_file=sprite_file, sprites=tuple(sprites))
+
+
+def sprite_matches_mode_filter(sprite: Sprite, mode_filter: str) -> bool:
+    if sprite.mode.mode_number is not None:
+        return mode_filter in {
+            str(sprite.mode.mode_number),
+            str(sprite.mode.base_mode_number),
+        }
+    return mode_filter in {
+        str(sprite.mode.raw_value),
+        summary_mode(sprite.mode),
+        f"type {sprite.mode.sprite_type}",
+    }
+
+
+def sprite_matches_type_filter(sprite: Sprite, type_filter: str) -> bool:
+    candidates = {
+        summary_type(sprite.mode).lower(),
+        unknown_or(sprite.mode.colour_model or "", sprite.mode.colour_model).lower(),
+    }
+    if sprite.mode.format_name == "old":
+        candidates.add("old")
+    else:
+        candidates.add(f"type {sprite.mode.sprite_type}")
+    return type_filter.lower() in candidates
 
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
@@ -809,6 +913,31 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Validate the sprite file structure and report warnings",
     )
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show more fields in text output",
+    )
+    parser.add_argument(
+        "--name",
+        dest="name_pattern",
+        help="Filter sprites by shell-style name pattern",
+    )
+    parser.add_argument(
+        "--mode",
+        dest="mode_filter",
+        help="Filter by mode number, base mode number, raw mode value, or type string",
+    )
+    parser.add_argument(
+        "--type",
+        dest="type_filter",
+        help="Filter by sprite type label such as old, 8bpp, 8bpp+a, 32bpp, RGB, or CMYK",
+    )
+    parser.add_argument(
+        "--has-mask",
+        action="store_true",
+        help="Show only sprites which contain mask data",
+    )
     return parser.parse_args(argv)
 
 
@@ -816,26 +945,34 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
         sprite_file = parse_sprite_file(args.sprite_file)
+        selection = select_sprites(
+            sprite_file,
+            name_pattern=args.name_pattern,
+            mode_filter=args.mode_filter,
+            type_filter=args.type_filter,
+            has_mask=args.has_mask,
+        )
         if args.check and args.json:
             payload = {
                 "path": str(sprite_file.path),
-                "warnings": collect_warnings(sprite_file),
-                "ok": not collect_warnings(sprite_file),
+                "filtered_sprite_count": len(selection.sprites),
+                "warnings": collect_warnings(selection),
+                "ok": not collect_warnings(selection),
             }
             output = json.dumps(payload, indent=2)
         elif args.check:
-            output = build_check_report(sprite_file)
+            output = build_check_report(selection, verbose=args.verbose)
         elif args.json:
-            output = build_json(sprite_file, args.sprite_name)
+            output = build_json(selection, args.sprite_name)
         elif args.sprite_name:
-            output = build_details(sprite_file, args.sprite_name)
+            output = build_details(selection, args.sprite_name, verbose=args.verbose)
         else:
-            output = build_summary(sprite_file)
+            output = build_summary(selection, verbose=args.verbose)
     except (OSError, SpriteFormatError) as exc:
         print(f"riscos-dumpsprites: {exc}", file=sys.stderr)
         return 1
 
     print(output)
-    if args.check and collect_warnings(sprite_file):
+    if args.check and collect_warnings(selection):
         return 1
     return 0

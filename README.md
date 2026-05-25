@@ -36,6 +36,20 @@ Validate a file:
 ./riscos-dumpsprites --check sprites/wavytile,ff9
 ```
 
+Show richer text output:
+
+```bash
+./riscos-dumpsprites --verbose sprites/manysprites,ff9
+```
+
+Filter the sprite list:
+
+```bash
+./riscos-dumpsprites --name 'basi4*' sprites/manysprites,ff9
+./riscos-dumpsprites --type 32bpp+a --has-mask sprites/manysprites,ff9
+./riscos-dumpsprites --mode 27 sprites/wavytile,ff9
+```
+
 The parser understands both old-format sprite mode words and the newer sprite mode word format, including alpha-channel and CMYK-related sprite type handling.
 Detailed reports and JSON output include decoded palette entries. Text output previews the first 16 palette entries for large palettes.
 For documented old-format mode numbers, the tool also reports standard mode metadata such as text resolution, graphics resolution, OS units, and logical colour count.
