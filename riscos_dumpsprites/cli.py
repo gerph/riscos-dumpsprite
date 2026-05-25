@@ -12,22 +12,52 @@ FILE_HEADER_SIZE = 12
 SPRITE_HEADER_SIZE = 44
 
 OLD_MODE_INFO = {
-    0: {"bpp": 1, "x_dpi": 90, "y_dpi": 45},
-    1: {"bpp": 2, "x_dpi": 45, "y_dpi": 45},
-    4: {"bpp": 1, "x_dpi": 45, "y_dpi": 45},
-    8: {"bpp": 2, "x_dpi": 90, "y_dpi": 45},
-    9: {"bpp": 4, "x_dpi": 45, "y_dpi": 45},
-    12: {"bpp": 4, "x_dpi": 90, "y_dpi": 45},
-    13: {"bpp": 8, "x_dpi": 45, "y_dpi": 45},
-    15: {"bpp": 8, "x_dpi": 90, "y_dpi": 45},
-    18: {"bpp": 1},
-    19: {"bpp": 2},
-    20: {"bpp": 4},
-    21: {"bpp": 8},
-    25: {"bpp": 1, "x_dpi": 90, "y_dpi": 90},
-    26: {"bpp": 2, "x_dpi": 90, "y_dpi": 90},
-    27: {"bpp": 4, "x_dpi": 90, "y_dpi": 90},
-    28: {"bpp": 8, "x_dpi": 90, "y_dpi": 90},
+    0: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
+    1: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
+    2: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics"},
+    3: {"text": (80, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text"},
+    4: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
+    5: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics"},
+    6: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text"},
+    7: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 16, "kind": "teletext"},
+    8: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
+    9: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
+    10: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics"},
+    11: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 4, "kind": "graphics"},
+    12: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
+    13: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 45, "y_dpi": 45, "kind": "graphics"},
+    14: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 16, "kind": "graphics"},
+    15: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics"},
+    16: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 16, "kind": "graphics"},
+    17: {"text": (132, 25), "pixel": (1056, 250), "os_units": (2112, 1000), "logical_colours": 16, "kind": "graphics"},
+    18: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 2, "kind": "graphics"},
+    19: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics"},
+    20: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics"},
+    21: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics"},
+    22: {"text": (96, 36), "pixel": (768, 288), "os_units": (768, 576), "logical_colours": 16, "kind": "graphics"},
+    23: {"text": (144, 56), "pixel": (1152, 896), "os_units": (2304, 1792), "logical_colours": 2, "kind": "graphics"},
+    24: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 256, "kind": "graphics"},
+    25: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 2, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
+    26: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 4, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
+    27: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 16, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
+    28: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 256, "x_dpi": 90, "y_dpi": 90, "kind": "graphics"},
+    29: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 2, "kind": "graphics"},
+    30: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 4, "kind": "graphics"},
+    31: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 16, "kind": "graphics"},
+    33: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 2, "kind": "graphics"},
+    34: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 4, "kind": "graphics"},
+    35: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 16, "kind": "graphics"},
+    36: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 256, "kind": "graphics"},
+    37: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 2, "kind": "graphics"},
+    38: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 4, "kind": "graphics"},
+    39: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 16, "kind": "graphics"},
+    40: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 256, "kind": "graphics"},
+    41: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 2, "kind": "graphics"},
+    42: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 4, "kind": "graphics"},
+    43: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 16, "kind": "graphics"},
+    44: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 2, "kind": "graphics"},
+    45: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 4, "kind": "graphics"},
+    46: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 16, "kind": "graphics"},
 }
 
 NEW_SPRITE_TYPES = {
@@ -53,8 +83,16 @@ class SpriteMode:
     mode_number: int | None
     sprite_type: int
     has_alpha: bool
+    kind: str | None
     bpp: int | None
     mask_bpp: int | None
+    logical_colours: int | None
+    text_columns: int | None
+    text_rows: int | None
+    pixel_width: int | None
+    pixel_height: int | None
+    os_unit_width: int | None
+    os_unit_height: int | None
     x_dpi: int | None
     y_dpi: int | None
     data_format: str | None
@@ -109,18 +147,34 @@ def parse_sprite_mode(raw_mode: int) -> SpriteMode:
     sprite_type = raw_mode >> 27
     if sprite_type == 0:
         mode_info = OLD_MODE_INFO.get(raw_mode, {})
-        bpp = mode_info.get("bpp")
+        bpp = infer_bpp_from_logical_colours(mode_info.get("logical_colours"))
         x_dpi = mode_info.get("x_dpi")
         y_dpi = mode_info.get("y_dpi")
-        description = f"old format, mode {raw_mode}"
+        pixel = mode_info.get("pixel")
+        logical_colours = mode_info.get("logical_colours")
+        if pixel and logical_colours:
+            description = (
+                f"old format, mode {raw_mode}, {pixel[0]}x{pixel[1]} pixels, "
+                f"{logical_colours} logical colours"
+            )
+        else:
+            description = f"old format, mode {raw_mode}"
         return SpriteMode(
             format_name="old",
             raw_value=raw_mode,
             mode_number=raw_mode,
             sprite_type=0,
             has_alpha=False,
+            kind=mode_info.get("kind"),
             bpp=bpp,
             mask_bpp=bpp,
+            logical_colours=logical_colours,
+            text_columns=tuple_or_none(mode_info.get("text"), 0),
+            text_rows=tuple_or_none(mode_info.get("text"), 1),
+            pixel_width=tuple_or_none(pixel, 0),
+            pixel_height=tuple_or_none(pixel, 1),
+            os_unit_width=tuple_or_none(mode_info.get("os_units"), 0),
+            os_unit_height=tuple_or_none(mode_info.get("os_units"), 1),
             x_dpi=x_dpi,
             y_dpi=y_dpi,
             data_format="indexed",
@@ -143,8 +197,16 @@ def parse_sprite_mode(raw_mode: int) -> SpriteMode:
         mode_number=None,
         sprite_type=sprite_type,
         has_alpha=has_alpha,
+        kind="graphics",
         bpp=type_info.get("bpp"),
         mask_bpp=8 if has_alpha else type_info.get("mask_bpp"),
+        logical_colours=None,
+        text_columns=None,
+        text_rows=None,
+        pixel_width=None,
+        pixel_height=None,
+        os_unit_width=None,
+        os_unit_height=None,
         x_dpi=x_dpi,
         y_dpi=y_dpi,
         data_format=type_info.get("data_format"),
@@ -302,6 +364,22 @@ def compute_width_pixels(
     return used_bits // bits_per_pixel
 
 
+def infer_bpp_from_logical_colours(logical_colours: int | None) -> int | None:
+    colour_to_bpp = {
+        2: 1,
+        4: 2,
+        16: 4,
+        256: 8,
+    }
+    return colour_to_bpp.get(logical_colours)
+
+
+def tuple_or_none(value: tuple[int, int] | None, index: int) -> int | None:
+    if value is None:
+        return None
+    return value[index]
+
+
 def decode_palette(data: bytes, palette_offset: int, palette_bytes: int) -> tuple[PaletteEntry, ...]:
     entries: list[PaletteEntry] = []
     for index in range(palette_bytes // 8):
@@ -362,6 +440,8 @@ def validate_sprite(
 
     if mode.format_name == "old" and mode.bpp is None:
         warnings.append(f"old-format mode {mode.raw_value} is not in the known mode table")
+    if mode.format_name == "old" and mode.kind in {"text", "teletext"}:
+        warnings.append(f"old-format mode {mode.raw_value} is a {mode.kind} mode, not a graphics mode")
     if mode.format_name == "new" and mode.sprite_type not in NEW_SPRITE_TYPES:
         warnings.append(f"new-format sprite type {mode.sprite_type} is not recognised")
 
@@ -454,7 +534,12 @@ def build_details(sprite_file: SpriteFile, sprite_name: str) -> str:
         f"Mode number: {unknown_or(str(sprite.mode.mode_number), sprite.mode.mode_number)}",
         f"Sprite type: {sprite.mode.sprite_type}",
         f"Alpha channel: {'yes' if sprite.mode.has_alpha else 'no'}",
+        f"Mode kind: {unknown_or(sprite.mode.kind, sprite.mode.kind)}",
         f"Bits per pixel: {unknown_or(str(sprite.mode.bpp), sprite.mode.bpp)}",
+        f"Logical colours: {unknown_or(str(sprite.mode.logical_colours), sprite.mode.logical_colours)}",
+        f"Text resolution: {format_pair(sprite.mode.text_columns, sprite.mode.text_rows)}",
+        f"Mode pixel resolution: {format_pair(sprite.mode.pixel_width, sprite.mode.pixel_height)}",
+        f"Mode OS units: {format_pair(sprite.mode.os_unit_width, sprite.mode.os_unit_height)}",
         f"Mask bits per pixel: {unknown_or(str(sprite.mode.mask_bpp), sprite.mode.mask_bpp)}",
         f"Horizontal dpi: {unknown_or(str(sprite.mode.x_dpi), sprite.mode.x_dpi)}",
         f"Vertical dpi: {unknown_or(str(sprite.mode.y_dpi), sprite.mode.y_dpi)}",
@@ -521,6 +606,8 @@ def find_sprite(sprite_file: SpriteFile, sprite_name: str) -> Sprite:
 
 def summary_mode(mode: SpriteMode) -> str:
     if mode.format_name == "old":
+        if mode.pixel_width is not None and mode.pixel_height is not None:
+            return f"{mode.mode_number} {mode.pixel_width}x{mode.pixel_height}"
         return str(mode.mode_number)
     alpha_suffix = "+a" if mode.has_alpha else ""
     return f"type {mode.sprite_type}{alpha_suffix} {mode.x_dpi}x{mode.y_dpi}"
@@ -539,6 +626,12 @@ def unknown_or(value: str, present: object | None) -> str:
     return value if present is not None else "unknown"
 
 
+def format_pair(first: int | None, second: int | None) -> str:
+    if first is None or second is None:
+        return "unknown"
+    return f"{first} x {second}"
+
+
 def collect_warnings(sprite_file: SpriteFile) -> list[str]:
     warnings = list(sprite_file.warnings)
     for sprite in sprite_file.sprites:
@@ -553,8 +646,22 @@ def sprite_mode_to_dict(mode: SpriteMode) -> dict[str, object]:
         "mode_number": mode.mode_number,
         "sprite_type": mode.sprite_type,
         "has_alpha": mode.has_alpha,
+        "kind": mode.kind,
         "bits_per_pixel": mode.bpp,
         "mask_bits_per_pixel": mode.mask_bpp,
+        "logical_colours": mode.logical_colours,
+        "text_resolution": {
+            "columns": mode.text_columns,
+            "rows": mode.text_rows,
+        },
+        "pixel_resolution": {
+            "width": mode.pixel_width,
+            "height": mode.pixel_height,
+        },
+        "os_unit_resolution": {
+            "width": mode.os_unit_width,
+            "height": mode.os_unit_height,
+        },
         "horizontal_dpi": mode.x_dpi,
         "vertical_dpi": mode.y_dpi,
         "data_format": mode.data_format,

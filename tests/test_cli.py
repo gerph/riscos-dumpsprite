@@ -30,12 +30,15 @@ class SpriteParserTests(unittest.TestCase):
         self.assertTrue(first.has_mask)
         self.assertEqual(first.mode.mode_number, 27)
         self.assertEqual(first.mode.bpp, 4)
+        self.assertEqual(first.mode.pixel_width, 640)
+        self.assertEqual(first.mode.pixel_height, 480)
+        self.assertEqual(first.mode.logical_colours, 16)
 
         summary = build_summary(sprite_file)
         self.assertIn("tile_1r", summary)
         self.assertIn("32x16", summary)
         self.assertIn("old", summary)
-        self.assertIn("27", summary)
+        self.assertIn("27 640x480", summary)
 
     def test_details_for_new_format_sprite(self) -> None:
         sprite_file = parse_sprite_file(ROOT / "sprites" / "basi3p02,ff9")
@@ -65,6 +68,21 @@ class SpriteParserTests(unittest.TestCase):
         self.assertEqual(payload["mode"]["sprite_type"], 2)
         self.assertEqual(payload["palette_entries"], 4)
         self.assertEqual(payload["palette"][0]["rgb"], {"red": 0, "green": 255, "blue": 0})
+
+    def test_old_mode_details_and_json_include_mode_metadata(self) -> None:
+        sprite_file = parse_sprite_file(ROOT / "sprites" / "wavytile,ff9")
+        details = build_details(sprite_file, "tile_1r")
+        self.assertIn("Mode description: old format, mode 27, 640x480 pixels, 16 logical colours", details)
+        self.assertIn("Mode kind: graphics", details)
+        self.assertIn("Logical colours: 16", details)
+        self.assertIn("Mode pixel resolution: 640 x 480", details)
+        self.assertIn("Mode OS units: 1280 x 960", details)
+
+        payload = json.loads(build_json(sprite_file, "tile_1r"))
+        self.assertEqual(payload["mode"]["mode_number"], 27)
+        self.assertEqual(payload["mode"]["kind"], "graphics")
+        self.assertEqual(payload["mode"]["logical_colours"], 16)
+        self.assertEqual(payload["mode"]["pixel_resolution"], {"width": 640, "height": 480})
 
     def test_check_report_ok_for_valid_sample(self) -> None:
         sprite_file = parse_sprite_file(ROOT / "sprites" / "wavytile,ff9")

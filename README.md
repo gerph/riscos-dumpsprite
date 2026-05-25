@@ -38,6 +38,7 @@ Validate a file:
 
 The parser understands both old-format sprite mode words and the newer sprite mode word format, including alpha-channel and CMYK-related sprite type handling.
 Detailed reports and JSON output include decoded palette entries. Text output previews the first 16 palette entries for large palettes.
+For documented old-format mode numbers, the tool also reports standard mode metadata such as text resolution, graphics resolution, OS units, and logical colour count.
 
 ## Development
 
