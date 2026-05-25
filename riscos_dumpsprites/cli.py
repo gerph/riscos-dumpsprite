@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import struct
 import sys
 from dataclasses import dataclass
@@ -61,6 +62,17 @@ class SpriteMode:
 
 
 @dataclass(frozen=True)
+class PaletteEntry:
+    index: int
+    word1: int
+    word2: int
+    red: int
+    green: int
+    blue: int
+    words_match: bool
+
+
+@dataclass(frozen=True)
 class Sprite:
     name: str
     file_offset: int
@@ -75,9 +87,11 @@ class Sprite:
     mask_bytes: int
     palette_bytes: int
     palette_entries: int
+    palette: tuple[PaletteEntry, ...]
     has_mask: bool
     mode: SpriteMode
     width_pixels: int | None
+    warnings: tuple[str, ...]
 
 
 @dataclass(frozen=True)
@@ -88,6 +102,7 @@ class SpriteFile:
     free_offset: int
     extension_words: tuple[int, ...]
     sprites: tuple[Sprite, ...]
+    warnings: tuple[str, ...]
 
 
 def parse_sprite_mode(raw_mode: int) -> SpriteMode:
@@ -159,6 +174,7 @@ def parse_sprite_file(path: Path) -> SpriteFile:
         for index in range(0, extension_bytes, 4)
     )
 
+    warnings: list[str] = []
     sprites: list[Sprite] = []
     sprite_offset = first_sprite_file_offset
     for sprite_index in range(sprite_count):
@@ -171,6 +187,11 @@ def parse_sprite_file(path: Path) -> SpriteFile:
             f"{path} ended sprite parsing at 0x{sprite_offset:x}, expected 0x{free_file_offset:x}"
         )
 
+    if free_file_offset != len(data):
+        warnings.append(
+            f"file free offset 0x{free_offset:x} does not match file size 0x{len(data) + 4:x}"
+        )
+
     return SpriteFile(
         path=path,
         sprite_count=sprite_count,
@@ -178,6 +199,7 @@ def parse_sprite_file(path: Path) -> SpriteFile:
         free_offset=free_offset,
         extension_words=extension_words,
         sprites=tuple(sprites),
+        warnings=tuple(warnings),
     )
 
 
@@ -212,10 +234,25 @@ def parse_sprite(data: bytes, path: Path, sprite_offset: int) -> Sprite:
     if palette_bytes % 8 != 0:
         raise SpriteFormatError(f"{path} has a sprite with a malformed palette: {name}")
 
+    palette = decode_palette(data, sprite_offset + SPRITE_HEADER_SIZE, palette_bytes)
     has_mask = mask_offset != image_offset
     image_bytes = (mask_offset if has_mask else next_offset) - image_offset
     mask_bytes = next_offset - mask_offset if has_mask else 0
     width_pixels = compute_width_pixels(width_words, first_bit_used, last_bit_used, mode.bpp)
+    warnings = validate_sprite(
+        name=name,
+        width_words=width_words,
+        height=height,
+        first_bit_used=first_bit_used,
+        last_bit_used=last_bit_used,
+        image_bytes=image_bytes,
+        mask_bytes=mask_bytes,
+        palette=palette,
+        palette_entries=palette_bytes // 8,
+        has_mask=has_mask,
+        mode=mode,
+        width_pixels=width_pixels,
+    )
 
     return Sprite(
         name=name,
@@ -231,9 +268,11 @@ def parse_sprite(data: bytes, path: Path, sprite_offset: int) -> Sprite:
         mask_bytes=mask_bytes,
         palette_bytes=palette_bytes,
         palette_entries=palette_bytes // 8,
+        palette=palette,
         has_mask=has_mask,
         mode=mode,
         width_pixels=width_pixels,
+        warnings=tuple(warnings),
     )
 
 
@@ -261,6 +300,107 @@ def compute_width_pixels(
     if used_bits <= 0 or used_bits % bits_per_pixel != 0:
         return None
     return used_bits // bits_per_pixel
+
+
+def decode_palette(data: bytes, palette_offset: int, palette_bytes: int) -> tuple[PaletteEntry, ...]:
+    entries: list[PaletteEntry] = []
+    for index in range(palette_bytes // 8):
+        word1, word2 = struct.unpack_from("<II", data, palette_offset + (index * 8))
+        entries.append(
+            PaletteEntry(
+                index=index,
+                word1=word1,
+                word2=word2,
+                red=(word1 >> 8) & 0xFF,
+                green=(word1 >> 16) & 0xFF,
+                blue=(word1 >> 24) & 0xFF,
+                words_match=word1 == word2,
+            )
+        )
+    return tuple(entries)
+
+
+def validate_sprite(
+    *,
+    name: str,
+    width_words: int,
+    height: int,
+    first_bit_used: int,
+    last_bit_used: int,
+    image_bytes: int,
+    mask_bytes: int,
+    palette: tuple[PaletteEntry, ...],
+    palette_entries: int,
+    has_mask: bool,
+    mode: SpriteMode,
+    width_pixels: int | None,
+) -> list[str]:
+    warnings: list[str] = []
+
+    if first_bit_used > 31 or last_bit_used > 31:
+        warnings.append("bit usage fields exceed the valid 0..31 range")
+    if first_bit_used > last_bit_used:
+        warnings.append("first bit used is greater than last bit used")
+    if width_pixels is None:
+        warnings.append("pixel width could not be derived from width words and mode")
+
+    expected_row_bytes = width_words * 4
+    expected_image_bytes = expected_row_bytes * height
+    if image_bytes != expected_image_bytes:
+        warnings.append(
+            f"image data is {image_bytes} bytes, expected {expected_image_bytes} from width/height"
+        )
+
+    expected_mask_bytes = expected_image_bytes if has_mask else 0
+    if has_mask and mode.has_alpha and width_pixels is not None and mode.mask_bpp is not None:
+        bits_per_row = width_pixels * mode.mask_bpp
+        expected_mask_bytes = (((bits_per_row + 31) // 32) * 4) * height
+    if has_mask and mask_bytes != expected_mask_bytes:
+        warnings.append(
+            f"mask data is {mask_bytes} bytes, expected {expected_mask_bytes} for this sprite type"
+        )
+
+    if mode.format_name == "old" and mode.bpp is None:
+        warnings.append(f"old-format mode {mode.raw_value} is not in the known mode table")
+    if mode.format_name == "new" and mode.sprite_type not in NEW_SPRITE_TYPES:
+        warnings.append(f"new-format sprite type {mode.sprite_type} is not recognised")
+
+    expected_palette_sizes = expected_palette_entry_counts(mode)
+    if palette_entries and expected_palette_sizes and palette_entries not in expected_palette_sizes:
+        expected_text = ", ".join(str(size) for size in sorted(expected_palette_sizes))
+        warnings.append(f"palette has {palette_entries} entries; expected one of {expected_text}")
+
+    mismatch_entries = [entry.index for entry in palette if not entry.words_match]
+    if mismatch_entries:
+        preview = ", ".join(str(index) for index in mismatch_entries[:8])
+        if len(mismatch_entries) > 8:
+            preview += ", ..."
+        warnings.append(f"palette entry words differ at indexes {preview}")
+
+    if mode.data_format == "indexed" and mode.bpp == 8 and palette_entries == 64:
+        warnings.append("64-entry 8bpp palette detected; this is valid but non-standard")
+
+    if mode.data_format in {"RGB", "CMYK"} and palette_entries:
+        warnings.append("true-colour sprite contains palette entries")
+
+    if not has_mask and mode.has_alpha:
+        warnings.append("alpha-capable sprite type has no mask data")
+
+    return [f"{name}: {warning}" for warning in warnings]
+
+
+def expected_palette_entry_counts(mode: SpriteMode) -> set[int]:
+    if mode.data_format != "indexed" or mode.bpp is None:
+        return {0}
+    if mode.bpp == 1:
+        return {0, 2}
+    if mode.bpp == 2:
+        return {0, 4}
+    if mode.bpp == 4:
+        return {0, 16}
+    if mode.bpp == 8:
+        return {0, 16, 64, 256}
+    return {0}
 
 
 def build_summary(sprite_file: SpriteFile) -> str:
@@ -320,7 +460,55 @@ def build_details(sprite_file: SpriteFile, sprite_name: str) -> str:
         f"Vertical dpi: {unknown_or(str(sprite.mode.y_dpi), sprite.mode.y_dpi)}",
         f"Data format: {unknown_or(sprite.mode.data_format, sprite.mode.data_format)}",
     ]
+    lines.extend(build_palette_lines(sprite))
+    lines.extend(build_warning_lines(sprite.warnings))
     return "\n".join(lines)
+
+
+def build_palette_lines(sprite: Sprite) -> list[str]:
+    lines = [
+        f"Palette entries decoded: {len(sprite.palette)}",
+    ]
+    if not sprite.palette:
+        return lines
+
+    lines.append("Palette preview:")
+    preview_count = min(len(sprite.palette), 16)
+    for entry in sprite.palette[:preview_count]:
+        lines.append(
+            "  "
+            f"{entry.index:3d}: "
+            f"rgb=({entry.red:3d},{entry.green:3d},{entry.blue:3d}) "
+            f"word1=0x{entry.word1:08x} "
+            f"word2=0x{entry.word2:08x}"
+        )
+    if len(sprite.palette) > preview_count:
+        lines.append(f"  ... {len(sprite.palette) - preview_count} more entries omitted")
+    return lines
+
+
+def build_warning_lines(warnings: tuple[str, ...]) -> list[str]:
+    lines = [f"Warnings: {len(warnings)}"]
+    for warning in warnings:
+        lines.append(f"  {warning}")
+    return lines
+
+
+def build_check_report(sprite_file: SpriteFile) -> str:
+    warnings = collect_warnings(sprite_file)
+    if not warnings:
+        return f"{sprite_file.path}: OK"
+    lines = [f"{sprite_file.path}: {len(warnings)} warning(s)"]
+    lines.extend(warnings)
+    return "\n".join(lines)
+
+
+def build_json(sprite_file: SpriteFile, sprite_name: str | None = None) -> str:
+    if sprite_name:
+        payload = sprite_to_dict(find_sprite(sprite_file, sprite_name))
+    else:
+        payload = sprite_file_to_dict(sprite_file)
+    return json.dumps(payload, indent=2)
 
 
 def find_sprite(sprite_file: SpriteFile, sprite_name: str) -> Sprite:
@@ -351,6 +539,78 @@ def unknown_or(value: str, present: object | None) -> str:
     return value if present is not None else "unknown"
 
 
+def collect_warnings(sprite_file: SpriteFile) -> list[str]:
+    warnings = list(sprite_file.warnings)
+    for sprite in sprite_file.sprites:
+        warnings.extend(sprite.warnings)
+    return warnings
+
+
+def sprite_mode_to_dict(mode: SpriteMode) -> dict[str, object]:
+    return {
+        "format": mode.format_name,
+        "raw_value": mode.raw_value,
+        "mode_number": mode.mode_number,
+        "sprite_type": mode.sprite_type,
+        "has_alpha": mode.has_alpha,
+        "bits_per_pixel": mode.bpp,
+        "mask_bits_per_pixel": mode.mask_bpp,
+        "horizontal_dpi": mode.x_dpi,
+        "vertical_dpi": mode.y_dpi,
+        "data_format": mode.data_format,
+        "description": mode.description,
+    }
+
+
+def palette_entry_to_dict(entry: PaletteEntry) -> dict[str, object]:
+    return {
+        "index": entry.index,
+        "word1": entry.word1,
+        "word2": entry.word2,
+        "rgb": {
+            "red": entry.red,
+            "green": entry.green,
+            "blue": entry.blue,
+        },
+        "words_match": entry.words_match,
+    }
+
+
+def sprite_to_dict(sprite: Sprite) -> dict[str, object]:
+    return {
+        "name": sprite.name,
+        "file_offset": sprite.file_offset,
+        "size_bytes": sprite.size_bytes,
+        "width_words": sprite.width_words,
+        "width_pixels": sprite.width_pixels,
+        "height": sprite.height,
+        "first_bit_used": sprite.first_bit_used,
+        "last_bit_used": sprite.last_bit_used,
+        "image_offset": sprite.image_offset,
+        "mask_offset": sprite.mask_offset,
+        "image_bytes": sprite.image_bytes,
+        "mask_bytes": sprite.mask_bytes,
+        "has_mask": sprite.has_mask,
+        "palette_bytes": sprite.palette_bytes,
+        "palette_entries": sprite.palette_entries,
+        "palette": [palette_entry_to_dict(entry) for entry in sprite.palette],
+        "mode": sprite_mode_to_dict(sprite.mode),
+        "warnings": list(sprite.warnings),
+    }
+
+
+def sprite_file_to_dict(sprite_file: SpriteFile) -> dict[str, object]:
+    return {
+        "path": str(sprite_file.path),
+        "sprite_count": sprite_file.sprite_count,
+        "first_sprite_offset": sprite_file.first_sprite_offset,
+        "free_offset": sprite_file.free_offset,
+        "extension_words": list(sprite_file.extension_words),
+        "warnings": list(sprite_file.warnings),
+        "sprites": [sprite_to_dict(sprite) for sprite in sprite_file.sprites],
+    }
+
+
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         prog="riscos-dumpsprites",
@@ -362,6 +622,16 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         nargs="?",
         help="Optional sprite name for a field-by-field description",
     )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit machine-readable JSON instead of text output",
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Validate the sprite file structure and report warnings",
+    )
     return parser.parse_args(argv)
 
 
@@ -369,7 +639,18 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
         sprite_file = parse_sprite_file(args.sprite_file)
-        if args.sprite_name:
+        if args.check and args.json:
+            payload = {
+                "path": str(sprite_file.path),
+                "warnings": collect_warnings(sprite_file),
+                "ok": not collect_warnings(sprite_file),
+            }
+            output = json.dumps(payload, indent=2)
+        elif args.check:
+            output = build_check_report(sprite_file)
+        elif args.json:
+            output = build_json(sprite_file, args.sprite_name)
+        elif args.sprite_name:
             output = build_details(sprite_file, args.sprite_name)
         else:
             output = build_summary(sprite_file)
@@ -378,4 +659,6 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     print(output)
+    if args.check and collect_warnings(sprite_file):
+        return 1
     return 0

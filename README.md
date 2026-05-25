@@ -6,6 +6,8 @@ It supports two output modes:
 
 - A column summary of all sprites in a sprite file.
 - A field-by-field report for a single named sprite.
+- Machine-readable JSON output for either form.
+- Validation reporting for malformed or suspicious sprite structures.
 
 ## Usage
 
@@ -21,7 +23,21 @@ Describe a single sprite:
 ./riscos-dumpsprites sprites/basi3p02,ff9 basi3p02
 ```
 
+Emit JSON:
+
+```bash
+./riscos-dumpsprites --json sprites/manysprites,ff9
+./riscos-dumpsprites --json sprites/basi3p02,ff9 basi3p02
+```
+
+Validate a file:
+
+```bash
+./riscos-dumpsprites --check sprites/wavytile,ff9
+```
+
 The parser understands both old-format sprite mode words and the newer sprite mode word format, including alpha-channel and CMYK-related sprite type handling.
+Detailed reports and JSON output include decoded palette entries. Text output previews the first 16 palette entries for large palettes.
 
 ## Development
 
@@ -39,4 +55,3 @@ Sample sprite files used for testing live in [`sprites/`](sprites/).
 - <https://www.riscos.com/support/developers/prm/video.html>
 - <https://www.riscos.com/support/developers/riscos6/graphics/sprites/cmyk.html>
 - <https://www.riscos.com/support/developers/riscos6/graphics/sprites/alphachannel.html>
-
