@@ -153,6 +153,50 @@ class SpriteParserTests(unittest.TestCase):
         self.assertIn("basi4a08", result.stdout)
         self.assertNotIn("basi0g01", result.stdout)
 
+    def test_extract_writes_single_sprite_file(self) -> None:
+        extracted_path = ROOT / "tests" / "tile_1r.sprite"
+        self.addCleanup(lambda: extracted_path.unlink(missing_ok=True))
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                "riscos-dumpsprites",
+                "sprites/wavytile,ff9",
+                "tile_1r",
+                "--extract",
+                str(extracted_path),
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Extracted tile_1r", result.stdout)
+        self.assertTrue(extracted_path.exists())
+
+        sprite_file = parse_sprite_file(extracted_path)
+        self.assertEqual(sprite_file.sprite_count, 1)
+        self.assertEqual(sprite_file.sprites[0].name, "tile_1r")
+        self.assertEqual(sprite_file.sprites[0].size_bytes, 684)
+
+    def test_extract_requires_sprite_name(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "riscos-dumpsprites",
+                "sprites/wavytile,ff9",
+                "--extract",
+                "tests/out.sprite",
+            ],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("--extract requires a sprite name", result.stderr)
+
     def test_check_mode_returns_non_zero_when_warnings_present(self) -> None:
         bad_path = ROOT / "tests" / "bad-palette.sprite"
         data = bytearray((ROOT / "sprites" / "basi3p02,ff9").read_bytes())

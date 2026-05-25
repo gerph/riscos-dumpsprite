@@ -50,6 +50,12 @@ Filter the sprite list:
 ./riscos-dumpsprites --mode 27 sprites/wavytile,ff9
 ```
 
+Extract a single sprite into its own sprite file:
+
+```bash
+./riscos-dumpsprites sprites/wavytile,ff9 tile_1r --extract tile_1r,ff9
+```
+
 The parser understands both old-format sprite mode words and the newer sprite mode word format, including alpha-channel and CMYK-related sprite type handling.
 Detailed reports and JSON output include decoded palette entries. Text output previews the first 16 palette entries for large palettes.
 For documented old-format mode numbers, the tool also reports standard mode metadata such as text resolution, graphics resolution, OS units, and logical colour count.

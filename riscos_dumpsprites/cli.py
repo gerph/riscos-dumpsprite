@@ -647,6 +647,16 @@ def build_json(selection: SpriteSelection, sprite_name: str | None = None) -> st
     return json.dumps(payload, indent=2)
 
 
+def extract_sprite(selection: SpriteSelection, sprite_name: str, output_path: Path) -> None:
+    sprite = find_sprite(selection.sprites, sprite_name)
+    source = selection.sprite_file.path.read_bytes()
+    sprite_bytes = source[sprite.file_offset : sprite.file_offset + sprite.size_bytes]
+    first_sprite_offset = 16
+    free_offset = first_sprite_offset + sprite.size_bytes
+    output = struct.pack("<III", 1, first_sprite_offset, free_offset) + sprite_bytes
+    output_path.write_bytes(output)
+
+
 def find_sprite(sprites: tuple[Sprite, ...], sprite_name: str) -> Sprite:
     for sprite in sprites:
         if sprite.name == sprite_name:
@@ -938,11 +948,20 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Show only sprites which contain mask data",
     )
+    parser.add_argument(
+        "--extract",
+        type=Path,
+        metavar="OUTPUT",
+        help="Write the selected sprite to its own sprite file",
+    )
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.extract is not None and not args.sprite_name:
+        print("riscos-dumpsprites: --extract requires a sprite name", file=sys.stderr)
+        return 1
     try:
         sprite_file = parse_sprite_file(args.sprite_file)
         selection = select_sprites(
@@ -952,7 +971,10 @@ def main(argv: list[str] | None = None) -> int:
             type_filter=args.type_filter,
             has_mask=args.has_mask,
         )
-        if args.check and args.json:
+        if args.extract is not None:
+            extract_sprite(selection, args.sprite_name, args.extract)
+            output = f"Extracted {args.sprite_name} to {args.extract}"
+        elif args.check and args.json:
             payload = {
                 "path": str(sprite_file.path),
                 "filtered_sprite_count": len(selection.sprites),
