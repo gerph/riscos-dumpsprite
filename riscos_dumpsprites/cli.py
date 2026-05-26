@@ -15,50 +15,50 @@ SPRITE_HEADER_SIZE = 44
 OLD_MODE_INFO = {
     0: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     1: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
-    2: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    2: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 22, "y_dpi": 45, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     3: {"text": (80, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     4: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
-    5: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    5: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 22, "y_dpi": 45, "kind": "graphics", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     6: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 2, "kind": "text", "memory_kb": 20, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     7: {"text": (40, 25), "pixel": None, "os_units": None, "logical_colours": 16, "kind": "teletext", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     8: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     9: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
-    10: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
-    11: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 4, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    10: {"text": (20, 32), "pixel": (160, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 22, "y_dpi": 45, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    11: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     12: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     13: {"text": (40, 32), "pixel": (320, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 45, "y_dpi": 45, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
-    14: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 16, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
+    14: {"text": (80, 25), "pixel": (640, 250), "os_units": (1280, 1000), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
     15: {"text": (80, 32), "pixel": (640, 256), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 160, "hz": 50, "monitors": (0, 1, 3, 4, 5)},
-    16: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 16, "kind": "graphics", "memory_kb": 132, "hz": 50, "monitors": (0, 1)},
-    17: {"text": (132, 25), "pixel": (1056, 250), "os_units": (2112, 1000), "logical_colours": 16, "kind": "graphics", "memory_kb": 132, "hz": 50, "monitors": (0, 1)},
-    18: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 2, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (1,)},
-    19: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 4, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (1,)},
-    20: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 16, "kind": "graphics", "memory_kb": 160, "hz": 50, "monitors": (1,)},
-    21: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 256, "kind": "graphics", "memory_kb": 320, "hz": 50, "monitors": (1,)},
-    22: {"text": (96, 36), "pixel": (768, 288), "os_units": (768, 576), "logical_colours": 16, "kind": "graphics", "memory_kb": 108, "hz": 50, "monitors": (0, 1)},
-    23: {"text": (144, 56), "pixel": (1152, 896), "os_units": (2304, 1792), "logical_colours": 2, "kind": "graphics", "memory_kb": 126, "hz": 64, "monitors": (2,)},
-    24: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 256, "kind": "graphics", "memory_kb": 264, "hz": 50, "monitors": (0, 1)},
+    16: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 132, "hz": 50, "monitors": (0, 1)},
+    17: {"text": (132, 25), "pixel": (1056, 250), "os_units": (2112, 1000), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 132, "hz": 50, "monitors": (0, 1)},
+    18: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 40, "hz": 50, "monitors": (1,)},
+    19: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 80, "hz": 50, "monitors": (1,)},
+    20: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 160, "hz": 50, "monitors": (1,)},
+    21: {"text": (80, 64), "pixel": (640, 512), "os_units": (1280, 1024), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 320, "hz": 50, "monitors": (1,)},
+    22: {"text": (96, 36), "pixel": (768, 288), "os_units": (768, 576), "logical_colours": 16, "x_dpi": 180, "y_dpi": 90, "kind": "graphics", "memory_kb": 108, "hz": 50, "monitors": (0, 1)},
+    23: {"text": (144, 56), "pixel": (1152, 896), "os_units": (2304, 1792), "logical_colours": 2, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 126, "hz": 64, "monitors": (2,)},
+    24: {"text": (132, 32), "pixel": (1056, 256), "os_units": (2112, 1024), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 264, "hz": 50, "monitors": (0, 1)},
     25: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 2, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 38, "hz": 60, "monitors": (1, 3, 4, 5)},
     26: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 4, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 75, "hz": 60, "monitors": (1, 3, 4, 5)},
     27: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 16, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 150, "hz": 60, "monitors": (1, 3, 4, 5)},
     28: {"text": (80, 60), "pixel": (640, 480), "os_units": (1280, 960), "logical_colours": 256, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 300, "hz": 60, "monitors": (1, 3, 4, 5)},
-    29: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 2, "kind": "graphics", "memory_kb": 59, "hz": 56, "monitors": (1, 4)},
-    30: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 4, "kind": "graphics", "memory_kb": 117, "hz": 56, "monitors": (1, 4)},
-    31: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 16, "kind": "graphics", "memory_kb": 234, "hz": 56, "monitors": (1, 4)},
-    33: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 2, "kind": "graphics", "memory_kb": 27, "hz": 50, "monitors": (0, 1)},
-    34: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 4, "kind": "graphics", "memory_kb": 54, "hz": 50, "monitors": (0, 1)},
-    35: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 16, "kind": "graphics", "memory_kb": 108, "hz": 50, "monitors": (0, 1)},
-    36: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 256, "kind": "graphics", "memory_kb": 216, "hz": 50, "monitors": (0, 1)},
-    37: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 2, "kind": "graphics", "memory_kb": 39, "hz": 60, "monitors": (1,)},
-    38: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 4, "kind": "graphics", "memory_kb": 77, "hz": 60, "monitors": (1,)},
-    39: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 16, "kind": "graphics", "memory_kb": 154, "hz": 60, "monitors": (1,)},
-    40: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 256, "kind": "graphics", "memory_kb": 308, "hz": 60, "monitors": (1,)},
-    41: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 2, "kind": "graphics", "memory_kb": 28, "hz": 60, "monitors": (1, 3, 4, 5)},
-    42: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 4, "kind": "graphics", "memory_kb": 55, "hz": 60, "monitors": (1, 3, 4, 5)},
-    43: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 16, "kind": "graphics", "memory_kb": 110, "hz": 60, "monitors": (1, 3, 4, 5)},
-    44: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 2, "kind": "graphics", "memory_kb": 16, "hz": 60, "monitors": (1, 3, 4, 5)},
-    45: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 4, "kind": "graphics", "memory_kb": 31, "hz": 60, "monitors": (1, 3, 4, 5)},
-    46: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 16, "kind": "graphics", "memory_kb": 63, "hz": 60, "monitors": (1, 3, 4, 5)},
+    29: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 2, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 59, "hz": 56, "monitors": (1, 4)},
+    30: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 4, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 117, "hz": 56, "monitors": (1, 4)},
+    31: {"text": (100, 75), "pixel": (800, 600), "os_units": (1600, 1200), "logical_colours": 16, "x_dpi": 90, "y_dpi": 90, "kind": "graphics", "memory_kb": 234, "hz": 56, "monitors": (1, 4)},
+    33: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 27, "hz": 50, "monitors": (0, 1)},
+    34: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 54, "hz": 50, "monitors": (0, 1)},
+    35: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 108, "hz": 50, "monitors": (0, 1)},
+    36: {"text": (96, 36), "pixel": (768, 288), "os_units": (1536, 1152), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 216, "hz": 50, "monitors": (0, 1)},
+    37: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 39, "hz": 60, "monitors": (1,)},
+    38: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 77, "hz": 60, "monitors": (1,)},
+    39: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 154, "hz": 60, "monitors": (1,)},
+    40: {"text": (112, 44), "pixel": (896, 352), "os_units": (1792, 1408), "logical_colours": 256, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 308, "hz": 60, "monitors": (1,)},
+    41: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 28, "hz": 60, "monitors": (1, 3, 4, 5)},
+    42: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 55, "hz": 60, "monitors": (1, 3, 4, 5)},
+    43: {"text": (80, 44), "pixel": (640, 352), "os_units": (1280, 1408), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 110, "hz": 60, "monitors": (1, 3, 4, 5)},
+    44: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 2, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 16, "hz": 60, "monitors": (1, 3, 4, 5)},
+    45: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 4, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 31, "hz": 60, "monitors": (1, 3, 4, 5)},
+    46: {"text": (80, 25), "pixel": (640, 200), "os_units": (1280, 800), "logical_colours": 16, "x_dpi": 90, "y_dpi": 45, "kind": "graphics", "memory_kb": 63, "hz": 60, "monitors": (1, 3, 4, 5)},
 }
 
 NEW_SPRITE_TYPES = {
@@ -668,10 +668,16 @@ def find_sprite(sprites: tuple[Sprite, ...], sprite_name: str) -> Sprite:
 def summary_mode(mode: SpriteMode) -> str:
     if mode.format_name == "old":
         if mode.pixel_width is not None and mode.pixel_height is not None:
-            return f"{mode.mode_number} {mode.pixel_width}x{mode.pixel_height}"
+            return f"{mode.mode_number} ({mode.pixel_width}x{mode.pixel_height})"
         return str(mode.mode_number)
     alpha_suffix = "+a" if mode.has_alpha else ""
-    return f"type {mode.sprite_type}{alpha_suffix} {mode.x_dpi}x{mode.y_dpi}"
+    return f"type {mode.sprite_type}{alpha_suffix}"
+
+
+def summary_dpi(mode: SpriteMode) -> str:
+    if mode.x_dpi is None or mode.y_dpi is None:
+        return ""
+    return f"{mode.x_dpi}x{mode.y_dpi}"
 
 
 def summary_type(mode: SpriteMode) -> str:
@@ -813,7 +819,7 @@ def sprite_file_to_dict(sprite_file: SpriteFile, sprites: tuple[Sprite, ...]) ->
 
 def summary_headers(verbose: bool) -> list[str]:
     if not verbose:
-        return ["Name", "Size", "Type", "BPP", "Mask", "Palette", "Mode"]
+        return ["Name", "Size", "Type", "BPP", "Mask", "Palette", "DPI", "Mode"]
     return [
         "Name",
         "Size",
@@ -824,6 +830,7 @@ def summary_headers(verbose: bool) -> list[str]:
         "Image",
         "MaskBytes",
         "Colour",
+        "DPI",
         "Mode",
     ]
 
@@ -843,11 +850,12 @@ def summary_row(sprite: Sprite, verbose: bool) -> list[str]:
                 str(sprite.image_bytes),
                 str(sprite.mask_bytes),
                 unknown_or(sprite.mode.colour_model, sprite.mode.colour_model),
+                summary_dpi(sprite.mode),
                 summary_mode(sprite.mode),
             ]
         )
         return row
-    row.append(summary_mode(sprite.mode))
+    row.extend([summary_dpi(sprite.mode), summary_mode(sprite.mode)])
     return row
 
 
