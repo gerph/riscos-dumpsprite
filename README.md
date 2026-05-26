@@ -71,6 +71,17 @@ python3 -m unittest discover -s tests
 
 Sample sprite files used for testing live in [`sprites/`](sprites/).
 
+## Publishing
+
+To publish a new version to PyPI:
+
+1. Update the version in `pyproject.toml`.
+2. Build and publish using `make`:
+   ```bash
+   make publish
+   ```
+   *Note: This requires `twine` to be configured with your PyPI credentials.*
+
 ## References
 
 - <https://www.riscos.com/support/developers/prm/sprites.html>
