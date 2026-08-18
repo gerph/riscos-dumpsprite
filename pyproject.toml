@@ -1,3 +1,31 @@
 [build-system]
 requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "riscos-dumpsprites"
+version = "0.1.0"
+description = "Display information about RISC OS sprite files"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Charles Ferguson", email = "gerph@gerph.org" },
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/gerph/riscos-dumpsprite"
+
+[project.scripts]
+riscos-dumpsprites = "riscos_dumpsprites.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["riscos_sprites*", "riscos_dumpsprites*"]
