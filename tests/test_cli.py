@@ -42,7 +42,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertIn("32x16", summary)
         self.assertIn("old", summary)
         self.assertIn("1bpp", summary)
-        self.assertIn("27 640x480", summary)
+        self.assertIn("27 (640x480)", summary)
 
     def test_details_for_new_format_sprite(self) -> None:
         sprite_file = parse_sprite_file(ROOT / "sprites" / "basi3p02,ff9")
