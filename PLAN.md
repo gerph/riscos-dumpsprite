@@ -142,14 +142,10 @@ frozen dataclasses since they are decoded value records, not things with behavio
   chunk/`zlib.decompress` reader (no external PNG library available) and checks pixel data,
   palette, and transparency handling for at least one sprite from each mask-strategy branch.
 
-- [ ] **Stage 5 — `to-pnm`**
-  `riscos_sprites/pnm.py`: default PPM (P6) output, palette/CMYK/16bpp all expanded to raw
-  8-bit RGB with no gamma correction; extended mode (flag, e.g. `--indexed`) for paletted
-  sprites writes PGM (P5) with raw palette-index pixel data and `#` comment lines recording
-  the palette, mode description, and DPI. Masks/alpha are not representable in PNM — dropped,
-  with this noted in the README. CLI: `riscos-sprites to-pnm ...` mirrors `to-png`'s argument
-  shape (`SPRITE_NAME OUTPUT.pnm` or `--all OUTPUT_DIR`). Add `tests/test_pnm.py` covering
-  both plain and extended-indexed output.
+- [x] **Stage 5 — `to-pnm`** (done as planned: `riscos_sprites/pnm.py`, `--indexed` flag,
+  `to-pnm` subcommand mirroring `to-png`'s shape. Masks ignored entirely, as PNM has no way
+  to represent them. 12 new tests (6 module-level + 6 CLI). README note on mask-dropping still
+  pending until Stage 7.)
 
 - [ ] **Stage 6 — `from-png`**
   `riscos_sprites/png_reader.py`: minimal PNG chunk reader (IHDR/PLTE/tRNS/IDAT,
