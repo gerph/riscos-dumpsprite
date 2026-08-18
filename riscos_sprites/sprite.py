@@ -375,10 +375,18 @@ def _validate(
             f"image data is {image_bytes} bytes, expected {expected_image_bytes} from width/height"
         )
 
-    expected_mask_bytes = expected_image_bytes if has_mask else 0
-    if has_mask and mode.has_alpha and width_pixels is not None and mode.mask_bpp is not None:
-        bits_per_row = width_pixels * mode.mask_bpp
-        expected_mask_bytes = (((bits_per_row + 31) // 32) * 4) * height
+    expected_mask_bytes = 0
+    if has_mask:
+        if mode.format_name == "old":
+            # Old-format masks are stored at the image's own bpp (a whole
+            # pixel-sized slot per pixel), reusing its row width exactly.
+            expected_mask_bytes = expected_image_bytes
+        elif width_pixels is not None and mode.mask_bpp is not None:
+            # New-format masks (1bpp classic, or 8bpp alpha) are packed
+            # into their own word-aligned rows, independent of the
+            # image's row width.
+            bits_per_row = width_pixels * mode.mask_bpp
+            expected_mask_bytes = (((bits_per_row + 31) // 32) * 4) * height
     if has_mask and mask_bytes != expected_mask_bytes:
         warnings.append(
             f"mask data is {mask_bytes} bytes, expected {expected_mask_bytes} for this sprite type"
