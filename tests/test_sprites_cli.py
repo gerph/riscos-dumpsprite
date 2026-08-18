@@ -149,5 +149,59 @@ class ToPngSubcommandTests(unittest.TestCase):
         self.assertIn("requires a sprite name", result.stderr)
 
 
+class ToPnmSubcommandTests(unittest.TestCase):
+    def test_converts_a_single_sprite_to_ppm_by_default(self) -> None:
+        output_path = ROOT / "tests" / "basi3p02-cli.pnm"
+        self.addCleanup(lambda: output_path.unlink(missing_ok=True))
+
+        result = run_riscos_sprites(
+            "to-pnm", "sprites/basi3p02,ff9", "basi3p02", str(output_path)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Converted basi3p02", result.stdout)
+        with output_path.open("rb") as handle:
+            self.assertEqual(handle.read(2), b"P6")
+
+    def test_indexed_flag_writes_pgm(self) -> None:
+        output_path = ROOT / "tests" / "basi3p02-indexed-cli.pnm"
+        self.addCleanup(lambda: output_path.unlink(missing_ok=True))
+
+        result = run_riscos_sprites(
+            "to-pnm", "--indexed", "sprites/basi3p02,ff9", "basi3p02", str(output_path)
+        )
+        self.assertEqual(result.returncode, 0)
+        with output_path.open("rb") as handle:
+            self.assertEqual(handle.read(2), b"P5")
+
+    def test_all_writes_one_pnm_per_selected_sprite(self) -> None:
+        output_dir = ROOT / "tests" / "to-pnm-all-cli"
+        self.addCleanup(lambda: shutil.rmtree(output_dir, ignore_errors=True))
+
+        result = run_riscos_sprites(
+            "to-pnm",
+            "sprites/manysprites,ff9",
+            str(output_dir),
+            "--all",
+            "--name",
+            "basi4*",
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Converted 2 sprite(s)", result.stdout)
+        produced = sorted(p.name for p in output_dir.glob("*.pnm"))
+        self.assertEqual(produced, ["basi4a08.pnm", "basi4a16.pnm"])
+
+    def test_all_rejects_a_sprite_name(self) -> None:
+        result = run_riscos_sprites(
+            "to-pnm", "sprites/wavytile,ff9", "tile_1r", "out-dir", "--all"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("does not take a sprite name", result.stderr)
+
+    def test_missing_sprite_name_without_all_is_an_error(self) -> None:
+        result = run_riscos_sprites("to-pnm", "sprites/wavytile,ff9", "out.pnm")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("requires a sprite name", result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()

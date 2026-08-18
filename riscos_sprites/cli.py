@@ -15,6 +15,7 @@ from pathlib import Path
 
 from .errors import SpriteFormatError
 from .png import sprite_to_png_file
+from .pnm import sprite_to_pnm_file
 from .spritefile import SpriteFile
 
 
@@ -126,6 +127,39 @@ def _add_to_png_subcommand(subparsers: argparse._SubParsersAction) -> None:
     parser.set_defaults(func=_run_to_png)
 
 
+def _add_to_pnm_subcommand(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser(
+        "to-pnm",
+        help="Convert one sprite, or every selected sprite, to PNM (PPM/PGM)",
+    )
+    parser.add_argument("sprite_file", type=Path, help="Path to the sprite file")
+    parser.add_argument(
+        "sprite_name",
+        nargs="?",
+        help="Name of the sprite to convert (omit this when --all is given)",
+    )
+    parser.add_argument(
+        "output",
+        type=Path,
+        help="Output PNM file, or output directory when --all is given",
+    )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="Convert every selected sprite into OUTPUT (a directory), one PNM per sprite",
+    )
+    parser.add_argument(
+        "--indexed",
+        action="store_true",
+        help=(
+            "For indexed sprites, write a PGM of raw palette indices with the palette "
+            "recorded in comments, instead of an expanded-colour PPM"
+        ),
+    )
+    _add_selection_filters(parser)
+    parser.set_defaults(func=_run_to_pnm)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="riscos-sprites",
@@ -135,6 +169,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_list_subcommand(subparsers)
     _add_extract_subcommand(subparsers)
     _add_to_png_subcommand(subparsers)
+    _add_to_pnm_subcommand(subparsers)
     return parser
 
 
@@ -200,6 +235,35 @@ def _run_to_png(args: argparse.Namespace) -> int:
     selection = sprite_file.select()
     sprite = selection.find(args.sprite_name)
     sprite_to_png_file(sprite, args.output)
+    print(f"Converted {args.sprite_name} to {args.output}")
+    return 0
+
+
+def _run_to_pnm(args: argparse.Namespace) -> int:
+    sprite_file = SpriteFile.parse(args.sprite_file)
+
+    if args.all:
+        if args.sprite_name is not None:
+            print("riscos-sprites: to-pnm --all does not take a sprite name", file=sys.stderr)
+            return 1
+        selection = sprite_file.select(
+            name_pattern=args.name_pattern,
+            mode_filter=args.mode_filter,
+            type_filter=args.type_filter,
+            has_mask=args.has_mask,
+        )
+        args.output.mkdir(parents=True, exist_ok=True)
+        for sprite in selection.sprites:
+            sprite_to_pnm_file(sprite, args.output / f"{sprite.name}.pnm", indexed=args.indexed)
+        print(f"Converted {len(selection.sprites)} sprite(s) to PNM in {args.output}")
+        return 0
+
+    if args.sprite_name is None:
+        print("riscos-sprites: to-pnm requires a sprite name unless --all is given", file=sys.stderr)
+        return 1
+    selection = sprite_file.select()
+    sprite = selection.find(args.sprite_name)
+    sprite_to_pnm_file(sprite, args.output, indexed=args.indexed)
     print(f"Converted {args.sprite_name} to {args.output}")
     return 0
 
