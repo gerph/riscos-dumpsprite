@@ -26,6 +26,7 @@ Homepage = "https://github.com/gerph/riscos-dumpsprite"
 
 [project.scripts]
 riscos-dumpsprites = "riscos_dumpsprites.cli:main"
+riscos-sprites = "riscos_sprites.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["riscos_sprites*", "riscos_dumpsprites*"]
