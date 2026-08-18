@@ -61,14 +61,51 @@ class DefaultPaletteTests(unittest.TestCase):
 
 
 class MaskDecodingTests(unittest.TestCase):
-    def test_classic_1bpp_mask_decodes_to_0_or_255(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "wavytile,ff9")
-        sprite = sprite_file.sprites[0]
+    def test_old_format_classic_mask_uses_image_bpp_not_1bpp_packing(self) -> None:
+        # Old-format masks are stored at the sprite's own bits-per-pixel
+        # (a whole pixel-sized slot per pixel, zero meaning transparent),
+        # not literally 1 bit per pixel densely packed -- "switcher" (an
+        # 8bpp old-format icon) makes a good check because its mask traces
+        # a distinctive cog/gear silhouette rather than a plain rectangle.
+        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite = sprite_named(sprite_file, "switcher")
+        self.assertEqual(sprite.mode.format_name, "old")
         mask = sprite.decode_mask()
         self.assertEqual(mask.kind, "1bpp")
-        self.assertEqual((mask.width, mask.height), (32, 16))
+        self.assertEqual((mask.width, mask.height), (40, 42))
         values = {value for row in mask.rows for value in row}
         self.assertTrue(values <= {0, 255})
+        # Top-left corner is outside the cog outline (transparent); the
+        # centre of the top row sits on the cog body (opaque).
+        self.assertEqual(mask.rows[0][0], 0)
+        self.assertEqual(mask.rows[8][20], 255)
+
+    def test_new_format_classic_mask_is_densely_1bpp_packed(self) -> None:
+        # No sample sprite exercises this path (only old-format classic
+        # masks appear in sprites/), so this is a synthetic check that a
+        # new-format 1bpp mask uses its own word-aligned row width,
+        # independent of the image's own (wider, per-image-bpp) rows.
+        from riscos_sprites.pixels import decode_mask
+
+        width_pixels = 40
+        height = 1
+        mask_width_words = (width_pixels + 31) // 32  # 2 words, not the image's 10
+        mask_bytes = bytearray(mask_width_words * 4)
+        mask_bytes[0] = 0b00000001  # pixel 0 opaque
+        mask_bytes[1] = 0b00000010  # pixel 9 opaque
+        mask = decode_mask(
+            mask_bytes=bytes(mask_bytes),
+            height=height,
+            width_pixels=width_pixels,
+            first_bit_used=0,
+            mask_kind="1bpp",
+            format_name="new",
+            image_bpp=8,
+            image_width_words=10,
+        )
+        self.assertEqual(mask.rows[0][0], 255)
+        self.assertEqual(mask.rows[0][9], 255)
+        self.assertEqual(sum(1 for v in mask.rows[0] if v), 2)
 
     def test_alpha_mask_decodes_to_known_gradient(self) -> None:
         # basi4a08 is the standard PngSuite grey+alpha test image: a

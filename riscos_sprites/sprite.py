@@ -203,12 +203,16 @@ class Sprite:
             raise SpriteFormatError(f"{self.name}: cannot decode mask without a known pixel width")
         if self.mode.mask_kind is None:
             raise SpriteFormatError(f"{self.name}: cannot decode mask without a known mask kind")
+        if self.mode.bpp is None:
+            raise SpriteFormatError(f"{self.name}: cannot decode mask without a known bits-per-pixel")
         return _decode_mask(
             mask_bytes=self.mask_data,
             height=self.height,
             width_pixels=self.width_pixels,
             first_bit_used=self.first_bit_used,
             mask_kind=self.mode.mask_kind,
+            format_name=self.mode.format_name,
+            image_bpp=self.mode.bpp,
             image_width_words=self.width_words,
         )
 

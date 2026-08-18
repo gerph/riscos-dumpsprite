@@ -146,6 +146,8 @@ def decode_mask(
     width_pixels: int,
     first_bit_used: int,
     mask_kind: str,
+    format_name: str,
+    image_bpp: int,
     image_width_words: int,
 ) -> DecodedMask:
     if mask_kind == "alpha":
@@ -158,11 +160,28 @@ def decode_mask(
         return DecodedMask(width=width_pixels, height=height, kind="alpha", rows=tuple(rows))
 
     if mask_kind == "1bpp":
-        row_bytes_len = image_width_words * 4
+        if format_name == "old":
+            # Old-format masks are stored at the *same* bits-per-pixel as
+            # the image itself (a whole pixel-sized slot per pixel, zero
+            # meaning transparent), not literally 1 bit per pixel -- they
+            # reuse the image's own row layout entirely.
+            row_bytes_len = image_width_words * 4
+            rows = []
+            for row in range(height):
+                row_bytes = mask_bytes[row * row_bytes_len : (row + 1) * row_bytes_len]
+                values = _row_values(row_bytes, image_width_words, first_bit_used, width_pixels, image_bpp)
+                rows.append(tuple(255 if value else 0 for value in values))
+            return DecodedMask(width=width_pixels, height=height, kind="1bpp", rows=tuple(rows))
+
+        # New-format classic masks really are 1 bit per pixel, packed
+        # into their own word-aligned rows independent of the image's
+        # own row width.
+        mask_width_words = (width_pixels + 31) // 32
+        row_bytes_len = mask_width_words * 4
         rows = []
         for row in range(height):
             row_bytes = mask_bytes[row * row_bytes_len : (row + 1) * row_bytes_len]
-            values = _row_values(row_bytes, image_width_words, first_bit_used, width_pixels, 1)
+            values = _row_values(row_bytes, mask_width_words, 0, width_pixels, 1)
             rows.append(tuple(255 if value else 0 for value in values))
         return DecodedMask(width=width_pixels, height=height, kind="1bpp", rows=tuple(rows))
 
