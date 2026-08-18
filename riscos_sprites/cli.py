@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 
 from .errors import SpriteFormatError
+from .from_png import write_sprite_file_from_png
 from .png import sprite_to_png_file
 from .pnm import sprite_to_pnm_file
 from .spritefile import SpriteFile
@@ -160,6 +161,25 @@ def _add_to_pnm_subcommand(subparsers: argparse._SubParsersAction) -> None:
     parser.set_defaults(func=_run_to_pnm)
 
 
+def _add_from_png_subcommand(subparsers: argparse._SubParsersAction) -> None:
+    parser = subparsers.add_parser(
+        "from-png",
+        help="Build a sprite file from one or more PNG images",
+    )
+    parser.add_argument(
+        "png_files",
+        type=Path,
+        nargs="+",
+        help="One or more PNG files to convert; each becomes one sprite",
+    )
+    parser.add_argument("output", type=Path, help="Path to write the resulting sprite file to")
+    parser.add_argument(
+        "--name",
+        help="Sprite name to use (only valid with a single PNG file; defaults to its filename stem)",
+    )
+    parser.set_defaults(func=_run_from_png)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="riscos-sprites",
@@ -170,6 +190,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_extract_subcommand(subparsers)
     _add_to_png_subcommand(subparsers)
     _add_to_pnm_subcommand(subparsers)
+    _add_from_png_subcommand(subparsers)
     return parser
 
 
@@ -265,6 +286,12 @@ def _run_to_pnm(args: argparse.Namespace) -> int:
     sprite = selection.find(args.sprite_name)
     sprite_to_pnm_file(sprite, args.output, indexed=args.indexed)
     print(f"Converted {args.sprite_name} to {args.output}")
+    return 0
+
+
+def _run_from_png(args: argparse.Namespace) -> int:
+    write_sprite_file_from_png(args.png_files, args.output, name=args.name)
+    print(f"Wrote {len(args.png_files)} sprite(s) to {args.output}")
     return 0
 
 

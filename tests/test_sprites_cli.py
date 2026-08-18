@@ -203,5 +203,64 @@ class ToPnmSubcommandTests(unittest.TestCase):
         self.assertIn("requires a sprite name", result.stderr)
 
 
+class FromPngSubcommandTests(unittest.TestCase):
+    def test_builds_a_sprite_file_from_one_png(self) -> None:
+        # Sprite names are limited to 12 characters, so the source PNG's
+        # filename stem must be kept short here.
+        png_path = ROOT / "tests" / "cli-src.png"
+        sprite_path = ROOT / "tests" / "cli-result.sprite"
+        self.addCleanup(lambda: png_path.unlink(missing_ok=True))
+        self.addCleanup(lambda: sprite_path.unlink(missing_ok=True))
+
+        convert = run_riscos_sprites(
+            "to-png", "sprites/basi3p02,ff9", "basi3p02", str(png_path)
+        )
+        self.assertEqual(convert.returncode, 0)
+
+        result = run_riscos_sprites("from-png", str(png_path), str(sprite_path))
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Wrote 1 sprite(s)", result.stdout)
+
+        sprite_file = SpriteFile.parse(sprite_path)
+        self.assertEqual(sprite_file.sprite_count, 1)
+        self.assertEqual(sprite_file.sprites[0].name, "cli-src")
+        self.assertEqual(sprite_file.warnings, ())
+
+    def test_multiple_pngs_become_multiple_sprites(self) -> None:
+        png_a = ROOT / "tests" / "multi-a.png"
+        png_b = ROOT / "tests" / "multi-b.png"
+        sprite_path = ROOT / "tests" / "cli-multi.sprite"
+        for path in (png_a, png_b, sprite_path):
+            self.addCleanup(lambda p=path: p.unlink(missing_ok=True))
+
+        self.assertEqual(
+            run_riscos_sprites("to-png", "sprites/basi3p02,ff9", "basi3p02", str(png_a)).returncode, 0
+        )
+        self.assertEqual(
+            run_riscos_sprites("to-png", "sprites/wavytile,ff9", "tile_1r", str(png_b)).returncode, 0
+        )
+
+        result = run_riscos_sprites("from-png", str(png_a), str(png_b), str(sprite_path))
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Wrote 2 sprite(s)", result.stdout)
+
+        sprite_file = SpriteFile.parse(sprite_path)
+        self.assertEqual([s.name for s in sprite_file.sprites], ["multi-a", "multi-b"])
+
+    def test_name_flag_rejects_multiple_pngs(self) -> None:
+        png_a = ROOT / "tests" / "name-a.png"
+        png_b = ROOT / "tests" / "name-b.png"
+        for path in (png_a, png_b):
+            self.addCleanup(lambda p=path: p.unlink(missing_ok=True))
+        run_riscos_sprites("to-png", "sprites/basi3p02,ff9", "basi3p02", str(png_a))
+        run_riscos_sprites("to-png", "sprites/basi3p02,ff9", "basi3p02", str(png_b))
+
+        result = run_riscos_sprites(
+            "from-png", "--name", "x", str(png_a), str(png_b), "out.sprite"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("single PNG file", result.stderr)
+
+
 if __name__ == "__main__":
     unittest.main()
