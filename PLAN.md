@@ -125,7 +125,11 @@ frozen dataclasses since they are decoded value records, not things with behavio
   for. No CMYK or reserved/24bpp sample sprites exist in `sprites/`, so those paths are
   covered only by direct unit tests of `cmyk_to_rgb()`, not a real-sprite round trip.
 
-- [ ] **Stage 4 — `to-png`**
+- [x] **Stage 4 — `to-png`** (done: implemented in `riscos_sprites/png.py`; the promotion chain
+  works on already-decoded pixel/mask grids rather than transliterating the C bit-twiddling.
+  Not replicated: the C code's debug placeholder colour for masked-out promoted pixels — ours
+  uses the pixel's own (invisible, alpha=0) colour instead, a harmless simplification. 15 new
+  tests, plus manual visual inspection via `host-open`.)
   `riscos_sprites/png.py`: hand-rolled PNG writer (IHDR/PLTE/tRNS/pHYs/tEXt/sBIT/IDAT via
   `zlib`/IEND, CRC32 via `zlib.crc32`). Ports the full C mask/promotion chain from `c/reverse`:
   colour-key search for a free palette/colour-cube slot (`NO_MASK`/`PROMOTE_PALETTE`/
