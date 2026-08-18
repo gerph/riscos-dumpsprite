@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 class SpriteParserTests(unittest.TestCase):
     def test_summary_for_wavytile(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "wavytile,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "wavytile,ff9"))
         self.assertEqual(sprite_file.sprite_count, 3)
 
         first = sprite_file.sprites[0]
@@ -45,7 +45,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertIn("27 (640x480)", summary)
 
     def test_details_for_new_format_sprite(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "basi3p02,ff9"))
         details = build_details(select_sprites(sprite_file), "basi3p02")
         self.assertIn("Mode format: new", details)
         self.assertIn("Sprite type: 2", details)
@@ -56,7 +56,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertIn("rgb=(  0,255,  0)", details)
 
     def test_alpha_sprites_are_decoded(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "manysprites,ff9"))
         alpha_sprite = next(sprite for sprite in sprite_file.sprites if sprite.name == "basi4a08")
         self.assertEqual(alpha_sprite.mode.sprite_type, 4)
         self.assertTrue(alpha_sprite.mode.has_alpha)
@@ -67,7 +67,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertEqual(alpha_sprite.palette_entries, 256)
 
     def test_json_output_contains_palette_and_mode(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "basi3p02,ff9"))
         payload = json.loads(build_json(select_sprites(sprite_file), "basi3p02"))
         self.assertEqual(payload["name"], "basi3p02")
         self.assertEqual(payload["mode"]["sprite_type"], 2)
@@ -75,7 +75,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertEqual(payload["palette"][0]["rgb"], {"red": 0, "green": 255, "blue": 0})
 
     def test_old_mode_details_and_json_include_mode_metadata(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "wavytile,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "wavytile,ff9"))
         details = build_details(select_sprites(sprite_file), "tile_1r")
         self.assertIn("Mode description: old format, mode 27, 640x480 pixels, 16 logical colours", details)
         self.assertIn("Mode kind: graphics", details)
@@ -109,14 +109,14 @@ class SpriteParserTests(unittest.TestCase):
         self.assertFalse(cmyk_mode.has_alpha)
 
     def test_check_report_ok_for_valid_sample(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "wavytile,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "wavytile,ff9"))
         self.assertEqual(
             build_check_report(select_sprites(sprite_file)),
-            f"{ROOT / 'sprites' / 'wavytile,ff9'}: OK",
+            "{0}: OK".format(ROOT.joinpath("sprites", "wavytile,ff9")),
         )
 
     def test_verbose_summary_and_name_filter(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "manysprites,ff9"))
         selection = select_sprites(sprite_file, name_pattern="basi4*")
         summary = build_summary(selection, verbose=True)
         self.assertIn("Sprites shown: 2 of 43", summary)
@@ -125,7 +125,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertNotIn("basi0g01", summary)
 
     def test_type_and_mask_filters_apply_to_json(self) -> None:
-        sprite_file = parse_sprite_file(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = parse_sprite_file(ROOT.joinpath("sprites", "manysprites,ff9"))
         selection = select_sprites(sprite_file, type_filter="32bpp+a", has_mask=True)
         payload = json.loads(build_json(selection))
         self.assertEqual(payload["sprite_count"], 43)
@@ -154,7 +154,7 @@ class SpriteParserTests(unittest.TestCase):
         self.assertNotIn("basi0g01", result.stdout)
 
     def test_extract_writes_single_sprite_file(self) -> None:
-        extracted_path = ROOT / "tests" / "tile_1r.sprite"
+        extracted_path = ROOT.joinpath("tests", "tile_1r.sprite")
         self.addCleanup(lambda: extracted_path.unlink(missing_ok=True))
 
         result = subprocess.run(
@@ -198,8 +198,8 @@ class SpriteParserTests(unittest.TestCase):
         self.assertIn("--extract requires a sprite name", result.stderr)
 
     def test_check_mode_returns_non_zero_when_warnings_present(self) -> None:
-        bad_path = ROOT / "tests" / "bad-palette.sprite"
-        data = bytearray((ROOT / "sprites" / "basi3p02,ff9").read_bytes())
+        bad_path = ROOT.joinpath("tests", "bad-palette.sprite")
+        data = bytearray(ROOT.joinpath("sprites", "basi3p02,ff9").read_bytes())
         data[0x38:0x3C] = (0x00FFFF00).to_bytes(4, "little")
         bad_path.write_bytes(data)
         self.addCleanup(bad_path.unlink)

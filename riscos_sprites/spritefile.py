@@ -1,4 +1,6 @@
-"""A parsed RISC OS sprite file, and selections/filters/reports over it."""
+"""
+A parsed RISC OS sprite file, and selections/filters/reports over it.
+"""
 
 from __future__ import annotations
 
@@ -16,19 +18,21 @@ FILE_HEADER_SIZE = 12
 
 def _area_to_file_offset(area_offset: int) -> int:
     if area_offset < 4:
-        raise SpriteFormatError(f"invalid area offset 0x{area_offset:x}")
+        raise SpriteFormatError("invalid area offset 0x{0:x}".format(area_offset))
     return area_offset - 4
 
 
 def _format_extension_words(words: tuple[int, ...]) -> str:
     if not words:
         return "none"
-    return ", ".join(f"0x{word:08x}" for word in words)
+    return ", ".join("0x{0:08x}".format(word) for word in words)
 
 
 @dataclass(frozen=True)
 class SpriteFile:
-    """A parsed RISC OS sprite file."""
+    """
+    A parsed RISC OS sprite file.
+    """
 
     path: Path
     sprite_count: int
@@ -42,20 +46,20 @@ class SpriteFile:
     def parse(cls, path: Path) -> "SpriteFile":
         data = path.read_bytes()
         if len(data) < FILE_HEADER_SIZE:
-            raise SpriteFormatError(f"{path} is too small to be a sprite file")
+            raise SpriteFormatError("{0} is too small to be a sprite file".format(path))
 
         sprite_count, first_sprite_offset, free_offset = struct.unpack_from("<III", data, 0)
         first_sprite_file_offset = _area_to_file_offset(first_sprite_offset)
         free_file_offset = _area_to_file_offset(free_offset)
 
         if first_sprite_file_offset < FILE_HEADER_SIZE:
-            raise SpriteFormatError(f"{path} has an invalid first sprite offset")
+            raise SpriteFormatError("{0} has an invalid first sprite offset".format(path))
         if free_file_offset > len(data):
-            raise SpriteFormatError(f"{path} has an invalid free offset")
+            raise SpriteFormatError("{0} has an invalid free offset".format(path))
 
         extension_bytes = first_sprite_file_offset - FILE_HEADER_SIZE
         if extension_bytes % 4 != 0:
-            raise SpriteFormatError(f"{path} has a misaligned file header")
+            raise SpriteFormatError("{0} has a misaligned file header".format(path))
         extension_words = tuple(
             struct.unpack_from("<I", data, FILE_HEADER_SIZE + index)[0]
             for index in range(0, extension_bytes, 4)
@@ -71,12 +75,16 @@ class SpriteFile:
 
         if sprite_offset != free_file_offset:
             raise SpriteFormatError(
-                f"{path} ended sprite parsing at 0x{sprite_offset:x}, expected 0x{free_file_offset:x}"
+                "{0} ended sprite parsing at 0x{1:x}, expected 0x{2:x}".format(
+                    path, sprite_offset, free_file_offset
+                )
             )
 
         if free_file_offset != len(data):
             warnings.append(
-                f"file free offset 0x{free_offset:x} does not match file size 0x{len(data) + 4:x}"
+                "file free offset 0x{0:x} does not match file size 0x{1:x}".format(
+                    free_offset, len(data) + 4
+                )
             )
 
         return cls(
@@ -111,7 +119,9 @@ class SpriteFile:
 
 @dataclass(frozen=True)
 class SpriteSelection:
-    """A sprite file together with a (possibly filtered) subset of its sprites."""
+    """
+    A sprite file together with a (possibly filtered) subset of its sprites.
+    """
 
     sprite_file: SpriteFile
     sprites: tuple[Sprite, ...]
@@ -121,7 +131,9 @@ class SpriteSelection:
             if sprite.name == sprite_name:
                 return sprite
         available = ", ".join(sprite.name for sprite in self.sprites)
-        raise SpriteFormatError(f"sprite '{sprite_name}' not found; available sprites: {available}")
+        raise SpriteFormatError(
+            "sprite '{0}' not found; available sprites: {1}".format(sprite_name, available)
+        )
 
     def warnings(self) -> list[str]:
         warnings = list(self.sprite_file.warnings)
@@ -149,23 +161,24 @@ class SpriteSelection:
             "  ".join(value.ljust(widths[index]) for index, value in enumerate(row)) for row in rows
         )
         if verbose:
-            return (
-                f"File: {self.sprite_file.path}\n"
-                f"Sprites shown: {len(self.sprites)} of {self.sprite_file.sprite_count}\n{table}"
+            return "File: {0}\nSprites shown: {1} of {2}\n{3}".format(
+                self.sprite_file.path, len(self.sprites), self.sprite_file.sprite_count, table
             )
         return table
 
     def details_text(self, sprite_name: str, verbose: bool = False) -> str:
         sprite = self.find(sprite_name)
-        lines = [f"File: {self.sprite_file.path}"]
+        lines = ["File: {0}".format(self.sprite_file.path)]
         lines.extend(sprite.details_lines(verbose=verbose))
         if verbose:
             lines.extend(
                 [
-                    f"File sprite count: {self.sprite_file.sprite_count}",
-                    f"File first sprite offset: 0x{self.sprite_file.first_sprite_offset:x}",
-                    f"File free offset: 0x{self.sprite_file.free_offset:x}",
-                    f"File extension words: {_format_extension_words(self.sprite_file.extension_words)}",
+                    "File sprite count: {0}".format(self.sprite_file.sprite_count),
+                    "File first sprite offset: 0x{0:x}".format(self.sprite_file.first_sprite_offset),
+                    "File free offset: 0x{0:x}".format(self.sprite_file.free_offset),
+                    "File extension words: {0}".format(
+                        _format_extension_words(self.sprite_file.extension_words)
+                    ),
                 ]
             )
         lines.extend(sprite.warning_lines())
@@ -175,14 +188,16 @@ class SpriteSelection:
         warnings = self.warnings()
         if not warnings:
             suffix = (
-                f" ({len(self.sprites)} of {self.sprite_file.sprite_count} sprites checked)"
+                " ({0} of {1} sprites checked)".format(len(self.sprites), self.sprite_file.sprite_count)
                 if verbose
                 else ""
             )
-            return f"{self.sprite_file.path}: OK{suffix}"
-        lines = [f"{self.sprite_file.path}: {len(warnings)} warning(s)"]
+            return "{0}: OK{1}".format(self.sprite_file.path, suffix)
+        lines = ["{0}: {1} warning(s)".format(self.sprite_file.path, len(warnings))]
         if verbose:
-            lines.append(f"Sprites checked: {len(self.sprites)} of {self.sprite_file.sprite_count}")
+            lines.append(
+                "Sprites checked: {0} of {1}".format(len(self.sprites), self.sprite_file.sprite_count)
+            )
         lines.extend(warnings)
         return "\n".join(lines)
 

@@ -1,4 +1,5 @@
-"""Decoding of raw RISC OS sprite image/mask bytes into pixel grids.
+"""
+Decoding of raw RISC OS sprite image/mask bytes into pixel grids.
 
 Ports the pixel-level algorithms from the RISC OS ConvertPNG module's
 ``c/reverse`` (Sprite -> PNG direction): the LSB-first bit packing RISC OS
@@ -17,7 +18,8 @@ from .errors import SpriteFormatError
 
 @dataclass(frozen=True)
 class DecodedPixels:
-    """A decoded grid of sprite image pixels, row by row.
+    """
+    A decoded grid of sprite image pixels, row by row.
 
     For ``kind == "indexed"`` each row is a tuple of palette indices.
     For ``kind == "rgb"`` each row is a tuple of ``(red, green, blue)``
@@ -32,7 +34,8 @@ class DecodedPixels:
 
 @dataclass(frozen=True)
 class DecodedMask:
-    """A decoded grid of sprite mask/alpha values, row by row.
+    """
+    A decoded grid of sprite mask/alpha values, row by row.
 
     Each row is a tuple of one 8-bit opacity value per pixel (0
     transparent, 255 opaque), regardless of whether the source was a
@@ -46,13 +49,14 @@ class DecodedMask:
 
 
 def _row_values(row_bytes: bytes, row_words: int, first_bit_used: int, count: int, bpp: int) -> list[int]:
-    """Unpack ``count`` values of ``bpp`` bits each from a word-aligned
+    """
+    Unpack ``count`` values of ``bpp`` bits each from a word-aligned
     row, skipping ``first_bit_used`` bits at the start of the row.
 
     RISC OS packs pixels least-significant-bit first within each 32-bit
     word, so pixel 0 of a word is its lowest ``bpp`` bits.
     """
-    words = struct.unpack(f"<{row_words}I", row_bytes)
+    words = struct.unpack("<{0}I".format(row_words), row_bytes)
     per_word = 32 // bpp
     mask = (1 << bpp) - 1
     values: list[int] = []
@@ -64,7 +68,9 @@ def _row_values(row_bytes: bytes, row_words: int, first_bit_used: int, count: in
 
 
 def _expand_5bit(colour: int) -> tuple[int, int, int]:
-    """Expand a 5:5:5 true-colour sprite pixel to 8 bits per channel."""
+    """
+    Expand a 5:5:5 true-colour sprite pixel to 8 bits per channel.
+    """
     r = (colour & (31 << 0)) << 3
     r |= r >> 5
     g = (colour & (31 << 5)) >> 2
@@ -75,7 +81,8 @@ def _expand_5bit(colour: int) -> tuple[int, int, int]:
 
 
 def cmyk_to_rgb(cyan: int, magenta: int, yellow: int, black: int) -> tuple[int, int, int]:
-    """Convert a CMYK sprite pixel's 8-bit ink channels to RGB.
+    """
+    Convert a CMYK sprite pixel's 8-bit ink channels to RGB.
 
     Sprite CMYK pixel bytes are stored in order cyan, magenta, yellow,
     black. Each RGB channel is the inverted, black-added complement of
@@ -117,7 +124,7 @@ def decode_pixels(
             elif bpp == 32:
                 pixel_row = tuple((value & 0xFF, (value >> 8) & 0xFF, (value >> 16) & 0xFF) for value in raw)
             else:
-                raise SpriteFormatError(f"unsupported RGB sprite bit depth: {bpp}")
+                raise SpriteFormatError("unsupported RGB sprite bit depth: {0}".format(bpp))
             rows.append(pixel_row)
         return DecodedPixels(width=width_pixels, height=height, kind="rgb", rows=tuple(rows))
 
@@ -136,7 +143,7 @@ def decode_pixels(
             rows.append(tuple(pixel_row))
         return DecodedPixels(width=width_pixels, height=height, kind="rgb", rows=tuple(rows))
 
-    raise SpriteFormatError(f"cannot decode pixel data for sprite data format: {data_format}")
+    raise SpriteFormatError("cannot decode pixel data for sprite data format: {0}".format(data_format))
 
 
 def decode_mask(
@@ -185,4 +192,4 @@ def decode_mask(
             rows.append(tuple(255 if value else 0 for value in values))
         return DecodedMask(width=width_pixels, height=height, kind="1bpp", rows=tuple(rows))
 
-    raise SpriteFormatError(f"cannot decode mask data of kind: {mask_kind}")
+    raise SpriteFormatError("cannot decode mask data of kind: {0}".format(mask_kind))

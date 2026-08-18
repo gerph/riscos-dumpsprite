@@ -64,8 +64,8 @@ class ListSubcommandTests(unittest.TestCase):
         self.assertIn("OK", result.stdout)
 
     def test_check_returns_non_zero_when_warnings_present(self) -> None:
-        bad_path = ROOT / "tests" / "bad-palette-sprites-cli.sprite"
-        data = bytearray((ROOT / "sprites" / "basi3p02,ff9").read_bytes())
+        bad_path = ROOT.joinpath("tests", "bad-palette-sprites-cli.sprite")
+        data = bytearray(ROOT.joinpath("sprites", "basi3p02,ff9").read_bytes())
         data[0x38:0x3C] = (0x00FFFF00).to_bytes(4, "little")
         bad_path.write_bytes(data)
         self.addCleanup(bad_path.unlink)
@@ -84,7 +84,7 @@ class ListSubcommandTests(unittest.TestCase):
 
 class ExtractSubcommandTests(unittest.TestCase):
     def test_extract_writes_single_sprite_file(self) -> None:
-        extracted_path = ROOT / "tests" / "tile_1r-sprites-cli.sprite"
+        extracted_path = ROOT.joinpath("tests", "tile_1r-sprites-cli.sprite")
         self.addCleanup(lambda: extracted_path.unlink(missing_ok=True))
 
         result = run_riscos_sprites(
@@ -107,7 +107,7 @@ class ExtractSubcommandTests(unittest.TestCase):
 
 class ToPngSubcommandTests(unittest.TestCase):
     def test_converts_a_single_sprite(self) -> None:
-        output_path = ROOT / "tests" / "basi3p02-cli.png"
+        output_path = ROOT.joinpath("tests", "basi3p02-cli.png")
         self.addCleanup(lambda: output_path.unlink(missing_ok=True))
 
         result = run_riscos_sprites(
@@ -120,7 +120,7 @@ class ToPngSubcommandTests(unittest.TestCase):
             self.assertEqual(handle.read(8), b"\x89PNG\r\n\x1a\n")
 
     def test_all_writes_one_png_per_selected_sprite(self) -> None:
-        output_dir = ROOT / "tests" / "to-png-all-cli"
+        output_dir = ROOT.joinpath("tests", "to-png-all-cli")
         self.addCleanup(lambda: shutil.rmtree(output_dir, ignore_errors=True))
 
         result = run_riscos_sprites(
@@ -151,7 +151,7 @@ class ToPngSubcommandTests(unittest.TestCase):
 
 class ToPnmSubcommandTests(unittest.TestCase):
     def test_converts_a_single_sprite_to_ppm_by_default(self) -> None:
-        output_path = ROOT / "tests" / "basi3p02-cli.pnm"
+        output_path = ROOT.joinpath("tests", "basi3p02-cli.pnm")
         self.addCleanup(lambda: output_path.unlink(missing_ok=True))
 
         result = run_riscos_sprites(
@@ -163,7 +163,7 @@ class ToPnmSubcommandTests(unittest.TestCase):
             self.assertEqual(handle.read(2), b"P6")
 
     def test_indexed_flag_writes_pgm(self) -> None:
-        output_path = ROOT / "tests" / "basi3p02-indexed-cli.pnm"
+        output_path = ROOT.joinpath("tests", "basi3p02-indexed-cli.pnm")
         self.addCleanup(lambda: output_path.unlink(missing_ok=True))
 
         result = run_riscos_sprites(
@@ -174,7 +174,7 @@ class ToPnmSubcommandTests(unittest.TestCase):
             self.assertEqual(handle.read(2), b"P5")
 
     def test_all_writes_one_pnm_per_selected_sprite(self) -> None:
-        output_dir = ROOT / "tests" / "to-pnm-all-cli"
+        output_dir = ROOT.joinpath("tests", "to-pnm-all-cli")
         self.addCleanup(lambda: shutil.rmtree(output_dir, ignore_errors=True))
 
         result = run_riscos_sprites(
@@ -207,8 +207,8 @@ class FromPngSubcommandTests(unittest.TestCase):
     def test_builds_a_sprite_file_from_one_png(self) -> None:
         # Sprite names are limited to 12 characters, so the source PNG's
         # filename stem must be kept short here.
-        png_path = ROOT / "tests" / "cli-src.png"
-        sprite_path = ROOT / "tests" / "cli-result.sprite"
+        png_path = ROOT.joinpath("tests", "cli-src.png")
+        sprite_path = ROOT.joinpath("tests", "cli-result.sprite")
         self.addCleanup(lambda: png_path.unlink(missing_ok=True))
         self.addCleanup(lambda: sprite_path.unlink(missing_ok=True))
 
@@ -227,9 +227,9 @@ class FromPngSubcommandTests(unittest.TestCase):
         self.assertEqual(sprite_file.warnings, ())
 
     def test_multiple_pngs_become_multiple_sprites(self) -> None:
-        png_a = ROOT / "tests" / "multi-a.png"
-        png_b = ROOT / "tests" / "multi-b.png"
-        sprite_path = ROOT / "tests" / "cli-multi.sprite"
+        png_a = ROOT.joinpath("tests", "multi-a.png")
+        png_b = ROOT.joinpath("tests", "multi-b.png")
+        sprite_path = ROOT.joinpath("tests", "cli-multi.sprite")
         for path in (png_a, png_b, sprite_path):
             self.addCleanup(lambda p=path: p.unlink(missing_ok=True))
 
@@ -248,8 +248,8 @@ class FromPngSubcommandTests(unittest.TestCase):
         self.assertEqual([s.name for s in sprite_file.sprites], ["multi-a", "multi-b"])
 
     def test_name_flag_rejects_multiple_pngs(self) -> None:
-        png_a = ROOT / "tests" / "name-a.png"
-        png_b = ROOT / "tests" / "name-b.png"
+        png_a = ROOT.joinpath("tests", "name-a.png")
+        png_b = ROOT.joinpath("tests", "name-b.png")
         for path in (png_a, png_b):
             self.addCleanup(lambda p=path: p.unlink(missing_ok=True))
         run_riscos_sprites("to-png", "sprites/basi3p02,ff9", "basi3p02", str(png_a))

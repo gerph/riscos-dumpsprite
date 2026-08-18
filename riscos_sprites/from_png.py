@@ -1,4 +1,5 @@
-"""Build a RISC OS sprite file from one or more PNG images.
+"""
+Build a RISC OS sprite file from one or more PNG images.
 
 Always builds new-format sprites: paletted PNGs (and grayscale PNGs,
 promoted to an indexed sprite with a synthesized grey-ramp palette)
@@ -58,14 +59,16 @@ def _sprite_name(path: Path, override: str | None) -> str:
     name = override if override is not None else path.stem
     if len(name.encode("latin-1", errors="replace")) > MAX_SPRITE_NAME_LENGTH:
         raise SpriteFormatError(
-            f"sprite name '{name}' is longer than {MAX_SPRITE_NAME_LENGTH} characters; "
-            "use --name to give an explicit shorter name"
+            "sprite name '{0}' is longer than {1} characters; "
+            "use --name to give an explicit shorter name".format(name, MAX_SPRITE_NAME_LENGTH)
         )
     return name
 
 
 def _indexed_from_png(png: PngImage):
-    """Returns (bpp, palette_rgb, index_rows, mask_rows_or_none, has_alpha)."""
+    """
+    Returns (bpp, palette_rgb, index_rows, mask_rows_or_none, has_alpha).
+    """
     if png.colour_type == COLOUR_TYPE_PALETTE:
         bpp = png.bit_depth
         palette = list(png.palette or [])
@@ -87,7 +90,9 @@ def _indexed_from_png(png: PngImage):
         index_rows = [[pixel[0] for pixel in row] for row in png.rows]
         alpha_rows = [[pixel[1] for pixel in row] for row in png.rows]
     else:
-        raise SpriteFormatError(f"unsupported PNG colour type for indexed conversion: {png.colour_type}")
+        raise SpriteFormatError(
+            "unsupported PNG colour type for indexed conversion: {0}".format(png.colour_type)
+        )
 
     mask_rows = None
     has_alpha = False
@@ -102,7 +107,9 @@ def _indexed_from_png(png: PngImage):
 
 
 def _true_colour_from_png(png: PngImage):
-    """Returns (pixel_word_rows, mask_rows_or_none, has_alpha)."""
+    """
+    Returns (pixel_word_rows, mask_rows_or_none, has_alpha).
+    """
     if png.colour_type == COLOUR_TYPE_RGBA:
         pixel_rows = [[red | (green << 8) | (blue << 16) for red, green, blue, _alpha in row] for row in png.rows]
         alpha_rows = [[alpha for _red, _green, _blue, alpha in row] for row in png.rows]
@@ -136,7 +143,7 @@ def _pack_row_values(values, row_words: int, bpp: int) -> bytes:
                 word |= (values[index] & value_mask) << (position * bpp)
             index += 1
         words.append(word)
-    return struct.pack(f"<{row_words}I", *words)
+    return struct.pack("<{0}I".format(row_words), *words)
 
 
 def _build_sprite_record(
@@ -216,7 +223,7 @@ def sprite_bytes_from_png(png_path: Path, *, name: str | None = None) -> bytes:
             sprite_name, 32, _TRUE_COLOUR_SPRITE_TYPE, has_alpha, png.width, png.height, None, pixel_rows, mask_rows, *dpi
         )
 
-    raise SpriteFormatError(f"unsupported PNG colour type: {png.colour_type}")
+    raise SpriteFormatError("unsupported PNG colour type: {0}".format(png.colour_type))
 
 
 def build_sprite_file_bytes(png_paths, *, name: str | None = None) -> bytes:

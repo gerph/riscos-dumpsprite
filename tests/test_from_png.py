@@ -17,11 +17,13 @@ def sprite_named(sprite_file: SpriteFile, name: str):
 
 
 def assert_visible_pixels_match(test: unittest.TestCase, original, round_tripped) -> None:
-    """Compares two sprites pixel-for-pixel by *colour*, not by raw index
+    """
+    Compares two sprites pixel-for-pixel by *colour*, not by raw index
     (from-png may legitimately choose different palette ordering), and by
     mask visibility. Underlying colour of masked-out pixels is ignored,
     since it's never displayed and to-png/from-png have no reason to
-    preserve it."""
+    preserve it.
+    """
     original_pixels = original.decode_pixels()
     round_tripped_pixels = round_tripped.decode_pixels()
     test.assertEqual(
@@ -45,28 +47,31 @@ def assert_visible_pixels_match(test: unittest.TestCase, original, round_tripped
             zip(orig_row, new_row, orig_mask_row, new_mask_row)
         ):
             test.assertEqual(
-                bool(orig_alpha), bool(new_alpha), f"visibility differs at ({row_index}, {col_index})"
+                bool(orig_alpha), bool(new_alpha),
+                "visibility differs at ({0}, {1})".format(row_index, col_index),
             )
             if orig_alpha and new_alpha:
                 orig_colour = colour_at(original, original_pixels.kind, orig_value)
                 new_colour = colour_at(round_tripped, round_tripped_pixels.kind, new_value)
                 test.assertEqual(
-                    orig_colour, new_colour, f"colour differs at ({row_index}, {col_index})"
+                    orig_colour, new_colour, "colour differs at ({0}, {1})".format(row_index, col_index)
                 )
             if original_mask is not None and round_tripped_mask is not None:
                 if original_mask.kind == "alpha" and round_tripped_mask.kind == "alpha":
-                    test.assertEqual(orig_alpha, new_alpha, f"alpha differs at ({row_index}, {col_index})")
+                    test.assertEqual(
+                        orig_alpha, new_alpha, "alpha differs at ({0}, {1})".format(row_index, col_index)
+                    )
 
 
 class RoundTripTests(unittest.TestCase):
     def _round_trip(self, sprite_file_name: str, sprite_name: str):
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / sprite_file_name)
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", sprite_file_name))
         sprite = sprite_named(sprite_file, sprite_name)
         with TemporaryDirectory() as tmp_name:
             tmp = Path(tmp_name)
-            png_path = tmp / f"{sprite_name}.png"
+            png_path = tmp.joinpath("{0}.png".format(sprite_name))
             sprite_to_png_file(sprite, png_path)
-            sprite_path = tmp / f"{sprite_name}.sprite"
+            sprite_path = tmp.joinpath("{0}.sprite".format(sprite_name))
             write_sprite_file_from_png([png_path], sprite_path)
             round_tripped_file = SpriteFile.parse(sprite_path)
         self.assertEqual(round_tripped_file.warnings, ())
@@ -137,18 +142,18 @@ class RoundTripTests(unittest.TestCase):
 
 class MultiPngTests(unittest.TestCase):
     def test_builds_a_multi_sprite_file(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         names = ["basi3p02", "basi0g08", "32k"]
         with TemporaryDirectory() as tmp_name:
             tmp = Path(tmp_name)
             paths = []
             for name in names:
                 sprite = sprite_named(sprite_file, name)
-                path = tmp / f"{name}.png"
+                path = tmp.joinpath("{0}.png".format(name))
                 sprite_to_png_file(sprite, path)
                 paths.append(path)
 
-            output_path = tmp / "multi.sprite"
+            output_path = tmp.joinpath("multi.sprite")
             write_sprite_file_from_png(paths, output_path)
             result = SpriteFile.parse(output_path)
 
@@ -161,9 +166,9 @@ class MultiPngTests(unittest.TestCase):
     def test_name_override_requires_single_png(self) -> None:
         with TemporaryDirectory() as tmp_name:
             tmp = Path(tmp_name)
-            sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
-            path_a = tmp / "a.png"
-            path_b = tmp / "b.png"
+            sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
+            path_a = tmp.joinpath("a.png")
+            path_b = tmp.joinpath("b.png")
             sprite_to_png_file(sprite_file.sprites[0], path_a)
             sprite_to_png_file(sprite_file.sprites[0], path_b)
             with self.assertRaises(SpriteFormatError):
@@ -172,8 +177,8 @@ class MultiPngTests(unittest.TestCase):
     def test_name_too_long_is_rejected(self) -> None:
         with TemporaryDirectory() as tmp_name:
             tmp = Path(tmp_name)
-            sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
-            long_path = tmp / "this-name-is-way-too-long-for-a-sprite.png"
+            sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
+            long_path = tmp.joinpath("this-name-is-way-too-long-for-a-sprite.png")
             sprite_to_png_file(sprite_file.sprites[0], long_path)
             with self.assertRaises(SpriteFormatError):
                 build_sprite_file_bytes([long_path])
@@ -181,10 +186,10 @@ class MultiPngTests(unittest.TestCase):
     def test_explicit_name_overrides_filename_stem(self) -> None:
         with TemporaryDirectory() as tmp_name:
             tmp = Path(tmp_name)
-            sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
-            path = tmp / "irrelevant.png"
+            sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
+            path = tmp.joinpath("irrelevant.png")
             sprite_to_png_file(sprite_file.sprites[0], path)
-            output_path = tmp / "out.sprite"
+            output_path = tmp.joinpath("out.sprite")
             write_sprite_file_from_png([path], output_path, name="shortname")
             result = SpriteFile.parse(output_path)
 

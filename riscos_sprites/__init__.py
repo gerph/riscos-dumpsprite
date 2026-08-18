@@ -1,4 +1,6 @@
-"""Decode RISC OS sprite files and convert them to other formats."""
+"""
+Decode RISC OS sprite files and convert them to other formats.
+"""
 
 from .errors import SpriteFormatError
 from .modes import NEW_SPRITE_TYPES, OLD_MODE_INFO, SpriteMode

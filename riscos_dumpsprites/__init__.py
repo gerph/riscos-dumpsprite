@@ -1,2 +1,4 @@
-"""RISC OS sprite file inspection."""
+"""
+RISC OS sprite file inspection.
+"""
 

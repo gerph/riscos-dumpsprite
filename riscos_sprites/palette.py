@@ -1,4 +1,6 @@
-"""Decoding of RISC OS sprite palettes."""
+"""
+Decoding of RISC OS sprite palettes.
+"""
 
 from __future__ import annotations
 
@@ -8,7 +10,9 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class PaletteEntry:
-    """A single decoded palette entry (two RISC OS palette words)."""
+    """
+    A single decoded palette entry (two RISC OS palette words).
+    """
 
     index: int
     word1: int
@@ -143,8 +147,10 @@ DEFAULT_PALETTE_WORDS: dict[int, tuple[int, ...]] = {
 
 
 def default_palette_entries(bpp: int) -> tuple[PaletteEntry, ...]:
-    """The default palette for `bpp` bits per pixel, or an empty tuple
-    if there is no default palette for that depth."""
+    """
+    The default palette for `bpp` bits per pixel, or an empty tuple
+    if there is no default palette for that depth.
+    """
     words = DEFAULT_PALETTE_WORDS.get(bpp)
     if not words:
         return ()

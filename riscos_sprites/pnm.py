@@ -1,4 +1,5 @@
-"""Convert a decoded RISC OS sprite to a PNM (PPM/PGM) file.
+"""
+Convert a decoded RISC OS sprite to a PNM (PPM/PGM) file.
 
 Two forms are supported:
 
@@ -28,7 +29,7 @@ from .sprite import Sprite
 def _format_dpi(sprite: Sprite) -> str:
     if sprite.mode.x_dpi is None or sprite.mode.y_dpi is None:
         return "unknown"
-    return f"{sprite.mode.x_dpi}x{sprite.mode.y_dpi}"
+    return "{0}x{1}".format(sprite.mode.x_dpi, sprite.mode.y_dpi)
 
 
 def sprite_to_ppm_bytes(sprite: Sprite) -> bytes:
@@ -47,27 +48,29 @@ def sprite_to_ppm_bytes(sprite: Sprite) -> bytes:
             for colour in row:
                 body.extend(colour)
 
-    header = f"P6\n{pixels.width} {pixels.height}\n255\n".encode("ascii")
+    header = "P6\n{0} {1}\n255\n".format(pixels.width, pixels.height).encode("ascii")
     return header + bytes(body)
 
 
 def sprite_to_indexed_pgm_bytes(sprite: Sprite) -> bytes:
     pixels = sprite.decode_pixels()
     if pixels.kind != "indexed":
-        raise SpriteFormatError(f"{sprite.name}: --indexed PNM output requires an indexed sprite")
+        raise SpriteFormatError("{0}: --indexed PNM output requires an indexed sprite".format(sprite.name))
 
     palette = sprite.effective_palette()
     maxval = (1 << sprite.mode.bpp) - 1
 
     comment_lines = [
-        f"# sprite: {sprite.name}",
-        f"# mode: {sprite.mode.description}",
-        f"# dpi: {_format_dpi(sprite)}",
+        "# sprite: {0}".format(sprite.name),
+        "# mode: {0}".format(sprite.mode.description),
+        "# dpi: {0}".format(_format_dpi(sprite)),
         "# palette: index red green blue",
     ]
-    comment_lines.extend(f"# {entry.index} {entry.red} {entry.green} {entry.blue}" for entry in palette)
+    comment_lines.extend(
+        "# {0} {1} {2} {3}".format(entry.index, entry.red, entry.green, entry.blue) for entry in palette
+    )
 
-    header = "P5\n" + "\n".join(comment_lines) + f"\n{pixels.width} {pixels.height}\n{maxval}\n"
+    header = "P5\n" + "\n".join(comment_lines) + "\n{0} {1}\n{2}\n".format(pixels.width, pixels.height, maxval)
     body = bytearray()
     for row in pixels.rows:
         body.extend(row)

@@ -20,7 +20,7 @@ class IndexedPixelDecodingTests(unittest.TestCase):
         # basi3p02 is the standard PngSuite "basic, 2-bit palette" test
         # image: four vertical colour bars, 4 pixels wide each, repeated
         # across the 32-pixel width.
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
         sprite = sprite_file.sprites[0]
         pixels = sprite.decode_pixels()
 
@@ -53,7 +53,7 @@ class DefaultPaletteTests(unittest.TestCase):
         self.assertEqual((entries[-1].red, entries[-1].green, entries[-1].blue), (0, 0, 0))
 
     def test_effective_palette_falls_back_to_default_when_sprite_has_none(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "!draw")
         self.assertEqual(sprite.palette_entries, 0)
         palette = sprite.effective_palette()
@@ -67,7 +67,7 @@ class MaskDecodingTests(unittest.TestCase):
         # not literally 1 bit per pixel densely packed -- "switcher" (an
         # 8bpp old-format icon) makes a good check because its mask traces
         # a distinctive cog/gear silhouette rather than a plain rectangle.
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "switcher")
         self.assertEqual(sprite.mode.format_name, "old")
         mask = sprite.decode_mask()
@@ -110,7 +110,7 @@ class MaskDecodingTests(unittest.TestCase):
     def test_alpha_mask_decodes_to_known_gradient(self) -> None:
         # basi4a08 is the standard PngSuite grey+alpha test image: a
         # smooth 0..255 alpha ramp across the width of the image.
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "basi4a08")
         mask = sprite.decode_mask()
         self.assertEqual(mask.kind, "alpha")
@@ -119,20 +119,20 @@ class MaskDecodingTests(unittest.TestCase):
         self.assertEqual(list(mask.rows[0]), sorted(mask.rows[0]))
 
     def test_no_mask_returns_none(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
         self.assertIsNone(sprite_file.sprites[0].decode_mask())
 
 
 class TrueColourPixelDecodingTests(unittest.TestCase):
     def test_32bpp_rgb_decodes_to_rgb_tuples(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "basi2c08")
         pixels = sprite.decode_pixels()
         self.assertEqual(pixels.kind, "rgb")
         self.assertEqual(pixels.rows[0][0], (255, 255, 255))
 
     def test_16bpp_rgb_decodes_without_error(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "32k")
         pixels = sprite.decode_pixels()
         self.assertEqual(pixels.kind, "rgb")

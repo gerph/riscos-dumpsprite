@@ -35,7 +35,7 @@ def parse_ppm_header(data: bytes) -> tuple[str, int, int, int, bytes]:
 
 class PpmConversionTests(unittest.TestCase):
     def test_indexed_sprite_expands_through_palette(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
         sprite = sprite_file.sprites[0]
         data = sprite_to_ppm_bytes(sprite)
 
@@ -52,7 +52,7 @@ class PpmConversionTests(unittest.TestCase):
         self.assertEqual(body, bytes(expected))
 
     def test_rgb_sprite_uses_decoded_colours_directly(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "basi2c08")
         data = sprite_to_ppm_bytes(sprite)
 
@@ -70,7 +70,7 @@ class PpmConversionTests(unittest.TestCase):
         # switcher is a masked old-format sprite; PPM output has no way to
         # represent transparency, so every pixel's own colour should come
         # through regardless of the mask.
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "switcher")
         data = sprite_to_ppm_bytes(sprite)
         _magic, width, height, _maxval, body = parse_ppm_header(data)
@@ -79,7 +79,7 @@ class PpmConversionTests(unittest.TestCase):
 
 class IndexedPgmConversionTests(unittest.TestCase):
     def test_pixel_data_is_raw_palette_indices(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
         sprite = sprite_file.sprites[0]
         data = sprite_to_indexed_pgm_bytes(sprite)
 
@@ -90,19 +90,19 @@ class IndexedPgmConversionTests(unittest.TestCase):
         self.assertEqual(len(expected_body), pixels.width * pixels.height)
 
     def test_comments_record_palette_mode_and_dpi(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
         sprite = sprite_file.sprites[0]
         data = sprite_to_indexed_pgm_bytes(sprite)
         text_part = data.split(b"\n\n", 1)[0] if b"\n\n" in data else data
         header_text = data[: data.index(str(sprite.width_pixels).encode() + b" ")].decode("ascii")
 
-        self.assertIn(f"# sprite: {sprite.name}", header_text)
+        self.assertIn("# sprite: {0}".format(sprite.name), header_text)
         self.assertIn("# mode:", header_text)
         self.assertIn("# dpi:", header_text)
         self.assertIn("# 0 0 255 0", header_text)  # first palette entry, from earlier tests: green
 
     def test_rejects_non_indexed_sprite(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "basi2c08")
         with self.assertRaises(SpriteFormatError):
             sprite_to_indexed_pgm_bytes(sprite)

@@ -1,4 +1,5 @@
-"""Convert a decoded RISC OS sprite to a PNG file.
+"""
+Convert a decoded RISC OS sprite to a PNG file.
 
 Follows the mask-handling strategy of the RISC OS ConvertPNG module's
 ``c/reverse``: a masked sprite first tries to find an unused palette
@@ -41,7 +42,9 @@ _DPI_TO_PIXELS_PER_METRE_SCALE = 0x275EB
 
 @dataclass
 class PngImage:
-    """An in-memory description of a PNG image, ready to be encoded."""
+    """
+    An in-memory description of a PNG image, ready to be encoded.
+    """
 
     width: int
     height: int
@@ -222,7 +225,7 @@ def _pack_scanline(row, colour_type: int, bit_depth: int) -> bytes:
         for red, green, blue, alpha in row:
             out.extend((red, green, blue, alpha))
         return bytes(out)
-    raise SpriteFormatError(f"unsupported PNG colour type: {colour_type}")
+    raise SpriteFormatError("unsupported PNG colour type: {0}".format(colour_type))
 
 
 def _chunk(tag: bytes, data: bytes) -> bytes:

@@ -1,4 +1,6 @@
-"""A single decoded RISC OS sprite."""
+"""
+A single decoded RISC OS sprite.
+"""
 
 from __future__ import annotations
 
@@ -43,19 +45,19 @@ def _unknown_or(value: str, present: object | None) -> str:
 def _format_pair(first: int | None, second: int | None) -> str:
     if first is None or second is None:
         return "unknown"
-    return f"{first} x {second}"
+    return "{0} x {1}".format(first, second)
 
 
 def _format_memory_kb(value: int | None) -> str:
     if value is None:
         return "unknown"
-    return f"{value}K"
+    return "{0}K".format(value)
 
 
 def _format_hz(value: int | None) -> str:
     if value is None:
         return "unknown"
-    return f"{value} Hz"
+    return "{0} Hz".format(value)
 
 
 def _format_monitors(monitors: tuple[int, ...]) -> str:
@@ -66,7 +68,9 @@ def _format_monitors(monitors: tuple[int, ...]) -> str:
 
 @dataclass(frozen=True)
 class Sprite:
-    """A single sprite decoded from a RISC OS sprite file."""
+    """
+    A single sprite decoded from a RISC OS sprite file.
+    """
 
     name: str
     file_offset: int
@@ -92,15 +96,19 @@ class Sprite:
     @classmethod
     def parse(cls, data: bytes, path: Path, sprite_offset: int) -> "Sprite":
         if sprite_offset + SPRITE_HEADER_SIZE > len(data):
-            raise SpriteFormatError(f"{path} has a truncated sprite header at 0x{sprite_offset:x}")
+            raise SpriteFormatError(
+                "{0} has a truncated sprite header at 0x{1:x}".format(path, sprite_offset)
+            )
 
         next_offset = _read_u32(data, sprite_offset)
         if next_offset < SPRITE_HEADER_SIZE:
-            raise SpriteFormatError(f"{path} has a sprite with invalid size at 0x{sprite_offset:x}")
+            raise SpriteFormatError(
+                "{0} has a sprite with invalid size at 0x{1:x}".format(path, sprite_offset)
+            )
 
         sprite_end = sprite_offset + next_offset
         if sprite_end > len(data):
-            raise SpriteFormatError(f"{path} has a sprite that runs past end of file")
+            raise SpriteFormatError("{0} has a sprite that runs past end of file".format(path))
 
         name = data[sprite_offset + 4 : sprite_offset + 16].split(b"\0", 1)[0].decode("latin-1")
         width_words = _read_u32(data, sprite_offset + 16) + 1
@@ -113,13 +121,19 @@ class Sprite:
         mode = SpriteMode.decode(raw_mode)
 
         if image_offset < SPRITE_HEADER_SIZE or image_offset > next_offset:
-            raise SpriteFormatError(f"{path} has a sprite with invalid image offset: {name}")
+            raise SpriteFormatError(
+                "{0} has a sprite with invalid image offset: {1}".format(path, name)
+            )
         if mask_offset < image_offset or mask_offset > next_offset:
-            raise SpriteFormatError(f"{path} has a sprite with invalid mask offset: {name}")
+            raise SpriteFormatError(
+                "{0} has a sprite with invalid mask offset: {1}".format(path, name)
+            )
 
         palette_bytes = image_offset - SPRITE_HEADER_SIZE
         if palette_bytes % 8 != 0:
-            raise SpriteFormatError(f"{path} has a sprite with a malformed palette: {name}")
+            raise SpriteFormatError(
+                "{0} has a sprite with a malformed palette: {1}".format(path, name)
+            )
 
         palette = PaletteEntry.decode_all(data, sprite_offset + SPRITE_HEADER_SIZE, palette_bytes)
         has_mask = mask_offset != image_offset
@@ -171,8 +185,10 @@ class Sprite:
         )
 
     def effective_palette(self) -> tuple[PaletteEntry, ...]:
-        """The sprite's own palette, or the standard default palette for
-        its bits-per-pixel if it has none of its own."""
+        """
+        The sprite's own palette, or the standard default palette for
+        its bits-per-pixel if it has none of its own.
+        """
         if self.palette:
             return self.palette
         if self.mode.data_format in {"monochrome", "indexed"} and self.mode.bpp is not None:
@@ -181,11 +197,17 @@ class Sprite:
 
     def decode_pixels(self) -> DecodedPixels:
         if self.width_pixels is None:
-            raise SpriteFormatError(f"{self.name}: cannot decode pixels without a known pixel width")
+            raise SpriteFormatError(
+                "{0}: cannot decode pixels without a known pixel width".format(self.name)
+            )
         if self.mode.bpp is None:
-            raise SpriteFormatError(f"{self.name}: cannot decode pixels without a known bits-per-pixel")
+            raise SpriteFormatError(
+                "{0}: cannot decode pixels without a known bits-per-pixel".format(self.name)
+            )
         if self.mode.data_format is None:
-            raise SpriteFormatError(f"{self.name}: cannot decode pixels without a known data format")
+            raise SpriteFormatError(
+                "{0}: cannot decode pixels without a known data format".format(self.name)
+            )
         return _decode_pixels(
             image_bytes=self.image_data,
             width_words=self.width_words,
@@ -200,11 +222,17 @@ class Sprite:
         if not self.has_mask:
             return None
         if self.width_pixels is None:
-            raise SpriteFormatError(f"{self.name}: cannot decode mask without a known pixel width")
+            raise SpriteFormatError(
+                "{0}: cannot decode mask without a known pixel width".format(self.name)
+            )
         if self.mode.mask_kind is None:
-            raise SpriteFormatError(f"{self.name}: cannot decode mask without a known mask kind")
+            raise SpriteFormatError(
+                "{0}: cannot decode mask without a known mask kind".format(self.name)
+            )
         if self.mode.bpp is None:
-            raise SpriteFormatError(f"{self.name}: cannot decode mask without a known bits-per-pixel")
+            raise SpriteFormatError(
+                "{0}: cannot decode mask without a known bits-per-pixel".format(self.name)
+            )
         return _decode_mask(
             mask_bytes=self.mask_data,
             height=self.height,
@@ -224,7 +252,7 @@ class Sprite:
     def summary_row(self, verbose: bool = False) -> list[str]:
         row = [
             self.name,
-            _unknown_or(f"{self.width_pixels}x{self.height}", self.width_pixels),
+            _unknown_or("{0}x{1}".format(self.width_pixels, self.height), self.width_pixels),
             self.mode.summary_type(),
             _unknown_or(str(self.mode.bpp), self.mode.bpp),
             self.summary_mask(),
@@ -246,7 +274,7 @@ class Sprite:
 
     def palette_lines(self, verbose: bool = False) -> list[str]:
         lines = [
-            f"Palette entries decoded: {len(self.palette)}",
+            "Palette entries decoded: {0}".format(len(self.palette)),
         ]
         if not self.palette:
             return lines
@@ -256,60 +284,70 @@ class Sprite:
         for entry in self.palette[:preview_count]:
             lines.append(
                 "  "
-                f"{entry.index:3d}: "
-                f"rgb=({entry.red:3d},{entry.green:3d},{entry.blue:3d}) "
-                f"word1=0x{entry.word1:08x} "
-                f"word2=0x{entry.word2:08x}"
+                "{0:3d}: "
+                "rgb=({1:3d},{2:3d},{3:3d}) "
+                "word1=0x{4:08x} "
+                "word2=0x{5:08x}".format(
+                    entry.index, entry.red, entry.green, entry.blue, entry.word1, entry.word2
+                )
             )
         if len(self.palette) > preview_count:
-            lines.append(f"  ... {len(self.palette) - preview_count} more entries omitted")
+            lines.append("  ... {0} more entries omitted".format(len(self.palette) - preview_count))
         return lines
 
     def warning_lines(self) -> list[str]:
-        lines = [f"Warnings: {len(self.warnings)}"]
+        lines = ["Warnings: {0}".format(len(self.warnings))]
         for warning in self.warnings:
-            lines.append(f"  {warning}")
+            lines.append("  {0}".format(warning))
         return lines
 
     def details_lines(self, verbose: bool = False) -> list[str]:
         lines = [
-            f"Sprite: {self.name}",
-            f"File offset: 0x{self.file_offset:x}",
-            f"Sprite size: {self.size_bytes} bytes",
-            f"Dimensions: {_unknown_or(str(self.width_pixels), self.width_pixels)} x {self.height} pixels",
-            f"Width in words: {self.width_words}",
-            f"First bit used: {self.first_bit_used}",
-            f"Last bit used: {self.last_bit_used}",
-            f"Image offset: 0x{self.image_offset:x}",
-            f"Mask offset: 0x{self.mask_offset:x}",
-            f"Image bytes: {self.image_bytes}",
-            f"Mask bytes: {self.mask_bytes}",
-            f"Has mask: {'yes' if self.has_mask else 'no'}",
-            f"Palette bytes: {self.palette_bytes}",
-            f"Palette entries: {self.palette_entries}",
-            f"Mode format: {self.mode.format_name}",
-            f"Mode description: {self.mode.description}",
-            f"Mode raw value: 0x{self.mode.raw_value:08x}",
-            f"Mode number: {_unknown_or(str(self.mode.mode_number), self.mode.mode_number)}",
-            f"Base mode number: {_unknown_or(str(self.mode.base_mode_number), self.mode.base_mode_number)}",
-            f"Shadow mode: {'yes' if self.mode.shadow_mode else 'no'}",
-            f"Sprite type: {self.mode.sprite_type}",
-            f"Alpha channel: {'yes' if self.mode.has_alpha else 'no'}",
-            f"Mode kind: {_unknown_or(self.mode.kind, self.mode.kind)}",
-            f"Bits per pixel: {_unknown_or(str(self.mode.bpp), self.mode.bpp)}",
-            f"Mask kind: {_unknown_or(self.mode.mask_kind, self.mode.mask_kind)}",
-            f"Logical colours: {_unknown_or(str(self.mode.logical_colours), self.mode.logical_colours)}",
-            f"Text resolution: {_format_pair(self.mode.text_columns, self.mode.text_rows)}",
-            f"Mode pixel resolution: {_format_pair(self.mode.pixel_width, self.mode.pixel_height)}",
-            f"Mode OS units: {_format_pair(self.mode.os_unit_width, self.mode.os_unit_height)}",
-            f"Mode memory: {_format_memory_kb(self.mode.memory_kb)}",
-            f"Mode refresh: {_format_hz(self.mode.refresh_hz)}",
-            f"Supported monitors: {_format_monitors(self.mode.monitor_types)}",
-            f"Mask bits per pixel: {_unknown_or(str(self.mode.mask_bpp), self.mode.mask_bpp)}",
-            f"Horizontal dpi: {_unknown_or(str(self.mode.x_dpi), self.mode.x_dpi)}",
-            f"Vertical dpi: {_unknown_or(str(self.mode.y_dpi), self.mode.y_dpi)}",
-            f"Data format: {_unknown_or(self.mode.data_format, self.mode.data_format)}",
-            f"Colour model: {_unknown_or(self.mode.colour_model, self.mode.colour_model)}",
+            "Sprite: {0}".format(self.name),
+            "File offset: 0x{0:x}".format(self.file_offset),
+            "Sprite size: {0} bytes".format(self.size_bytes),
+            "Dimensions: {0} x {1} pixels".format(
+                _unknown_or(str(self.width_pixels), self.width_pixels), self.height
+            ),
+            "Width in words: {0}".format(self.width_words),
+            "First bit used: {0}".format(self.first_bit_used),
+            "Last bit used: {0}".format(self.last_bit_used),
+            "Image offset: 0x{0:x}".format(self.image_offset),
+            "Mask offset: 0x{0:x}".format(self.mask_offset),
+            "Image bytes: {0}".format(self.image_bytes),
+            "Mask bytes: {0}".format(self.mask_bytes),
+            "Has mask: {0}".format("yes" if self.has_mask else "no"),
+            "Palette bytes: {0}".format(self.palette_bytes),
+            "Palette entries: {0}".format(self.palette_entries),
+            "Mode format: {0}".format(self.mode.format_name),
+            "Mode description: {0}".format(self.mode.description),
+            "Mode raw value: 0x{0:08x}".format(self.mode.raw_value),
+            "Mode number: {0}".format(_unknown_or(str(self.mode.mode_number), self.mode.mode_number)),
+            "Base mode number: {0}".format(
+                _unknown_or(str(self.mode.base_mode_number), self.mode.base_mode_number)
+            ),
+            "Shadow mode: {0}".format("yes" if self.mode.shadow_mode else "no"),
+            "Sprite type: {0}".format(self.mode.sprite_type),
+            "Alpha channel: {0}".format("yes" if self.mode.has_alpha else "no"),
+            "Mode kind: {0}".format(_unknown_or(self.mode.kind, self.mode.kind)),
+            "Bits per pixel: {0}".format(_unknown_or(str(self.mode.bpp), self.mode.bpp)),
+            "Mask kind: {0}".format(_unknown_or(self.mode.mask_kind, self.mode.mask_kind)),
+            "Logical colours: {0}".format(
+                _unknown_or(str(self.mode.logical_colours), self.mode.logical_colours)
+            ),
+            "Text resolution: {0}".format(_format_pair(self.mode.text_columns, self.mode.text_rows)),
+            "Mode pixel resolution: {0}".format(
+                _format_pair(self.mode.pixel_width, self.mode.pixel_height)
+            ),
+            "Mode OS units: {0}".format(_format_pair(self.mode.os_unit_width, self.mode.os_unit_height)),
+            "Mode memory: {0}".format(_format_memory_kb(self.mode.memory_kb)),
+            "Mode refresh: {0}".format(_format_hz(self.mode.refresh_hz)),
+            "Supported monitors: {0}".format(_format_monitors(self.mode.monitor_types)),
+            "Mask bits per pixel: {0}".format(_unknown_or(str(self.mode.mask_bpp), self.mode.mask_bpp)),
+            "Horizontal dpi: {0}".format(_unknown_or(str(self.mode.x_dpi), self.mode.x_dpi)),
+            "Vertical dpi: {0}".format(_unknown_or(str(self.mode.y_dpi), self.mode.y_dpi)),
+            "Data format: {0}".format(_unknown_or(self.mode.data_format, self.mode.data_format)),
+            "Colour model: {0}".format(_unknown_or(self.mode.colour_model, self.mode.colour_model)),
         ]
         if self.mode.data_format == "CMYK":
             lines.extend(
@@ -372,7 +410,9 @@ def _validate(
     expected_image_bytes = expected_row_bytes * height
     if image_bytes != expected_image_bytes:
         warnings.append(
-            f"image data is {image_bytes} bytes, expected {expected_image_bytes} from width/height"
+            "image data is {0} bytes, expected {1} from width/height".format(
+                image_bytes, expected_image_bytes
+            )
         )
 
     expected_mask_bytes = 0
@@ -389,27 +429,33 @@ def _validate(
             expected_mask_bytes = (((bits_per_row + 31) // 32) * 4) * height
     if has_mask and mask_bytes != expected_mask_bytes:
         warnings.append(
-            f"mask data is {mask_bytes} bytes, expected {expected_mask_bytes} for this sprite type"
+            "mask data is {0} bytes, expected {1} for this sprite type".format(
+                mask_bytes, expected_mask_bytes
+            )
         )
 
     if mode.format_name == "old" and mode.bpp is None:
-        warnings.append(f"old-format mode {mode.raw_value} is not in the known mode table")
+        warnings.append("old-format mode {0} is not in the known mode table".format(mode.raw_value))
     if mode.format_name == "old" and mode.kind in {"text", "teletext"}:
-        warnings.append(f"old-format mode {mode.raw_value} is a {mode.kind} mode, not a graphics mode")
+        warnings.append(
+            "old-format mode {0} is a {1} mode, not a graphics mode".format(mode.raw_value, mode.kind)
+        )
     if mode.format_name == "new" and mode.sprite_type not in NEW_SPRITE_TYPES:
-        warnings.append(f"new-format sprite type {mode.sprite_type} is not recognised")
+        warnings.append("new-format sprite type {0} is not recognised".format(mode.sprite_type))
 
     expected_palette_sizes = mode.expected_palette_entry_counts()
     if palette_entries and expected_palette_sizes and palette_entries not in expected_palette_sizes:
         expected_text = ", ".join(str(size) for size in sorted(expected_palette_sizes))
-        warnings.append(f"palette has {palette_entries} entries; expected one of {expected_text}")
+        warnings.append(
+            "palette has {0} entries; expected one of {1}".format(palette_entries, expected_text)
+        )
 
     mismatch_entries = [entry.index for entry in palette if not entry.words_match]
     if mismatch_entries:
         preview = ", ".join(str(index) for index in mismatch_entries[:8])
         if len(mismatch_entries) > 8:
             preview += ", ..."
-        warnings.append(f"palette entry words differ at indexes {preview}")
+        warnings.append("palette entry words differ at indexes {0}".format(preview))
 
     if mode.data_format == "indexed" and mode.bpp == 8 and palette_entries == 64:
         warnings.append("64-entry 8bpp palette detected; this is valid but non-standard")
@@ -420,4 +466,4 @@ def _validate(
     if not has_mask and mode.has_alpha:
         warnings.append("alpha-capable sprite type has no mask data")
 
-    return [f"{name}: {warning}" for warning in warnings]
+    return ["{0}: {1}".format(name, warning) for warning in warnings]

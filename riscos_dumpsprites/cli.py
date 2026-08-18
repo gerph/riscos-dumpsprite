@@ -1,4 +1,5 @@
-"""Command line interface for riscos-dumpsprites.
+"""
+Command line interface for riscos-dumpsprites.
 
 Kept as a thin, backward-compatible shim: all sprite decoding lives in the
 ``riscos_sprites`` package now, this module just wires it up behind the
@@ -125,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         if args.extract is not None:
             selection.extract(args.sprite_name, args.extract)
-            output = f"Extracted {args.sprite_name} to {args.extract}"
+            output = "Extracted {0} to {1}".format(args.sprite_name, args.extract)
         elif args.check and args.json:
             output = selection.check_json_text()
         elif args.check:
@@ -137,7 +138,7 @@ def main(argv: list[str] | None = None) -> int:
         else:
             output = build_summary(selection, verbose=args.verbose)
     except (OSError, SpriteFormatError) as exc:
-        print(f"riscos-dumpsprites: {exc}", file=sys.stderr)
+        print("riscos-dumpsprites: {0}".format(exc), file=sys.stderr)
         return 1
 
     print(output)

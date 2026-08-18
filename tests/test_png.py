@@ -34,7 +34,7 @@ def read_png_chunks(data: bytes) -> dict[bytes, list[bytes]]:
         payload = data[offset + 8 : offset + 8 + length]
         crc_stored = struct.unpack_from(">I", data, offset + 8 + length)[0]
         crc_actual = zlib.crc32(tag + payload) & 0xFFFFFFFF
-        assert crc_stored == crc_actual, f"bad CRC for chunk {tag!r}"
+        assert crc_stored == crc_actual, "bad CRC for chunk {0!r}".format(tag)
         chunks.setdefault(tag, []).append(payload)
         offset += 12 + length
         if tag == b"IEND":
@@ -43,8 +43,10 @@ def read_png_chunks(data: bytes) -> dict[bytes, list[bytes]]:
 
 
 def decode_png_rows(data: bytes) -> tuple[dict, list[list[int]]]:
-    """A minimal, filter-type-0-only PNG decoder, just enough to verify
-    our own writer's output round-trips correctly."""
+    """
+    A minimal, filter-type-0-only PNG decoder, just enough to verify
+    our own writer's output round-trips correctly.
+    """
     chunks = read_png_chunks(data)
     width, height, bit_depth, colour_type, _, _, _ = struct.unpack(">IIBBBBB", chunks[b"IHDR"][0])
     raw = zlib.decompress(b"".join(chunks.get(b"IDAT", [])))
@@ -97,9 +99,11 @@ class _FakeMode:
 
 
 class _FakeSprite:
-    """A minimal Sprite stand-in exposing just what png.py's internal
+    """
+    A minimal Sprite stand-in exposing just what png.py's internal
     _build_indexed/_build_rgb helpers need, for exercising promotion
-    branches that aren't reachable from the real sample sprite files."""
+    branches that aren't reachable from the real sample sprite files.
+    """
 
     def __init__(self, bpp: int, data_format: str, palette: tuple[PaletteEntry, ...]) -> None:
         self.mode = _FakeMode(bpp, data_format)
@@ -118,7 +122,7 @@ def _palette(colours: list[tuple[int, int, int]]) -> tuple[PaletteEntry, ...]:
 
 class RealSpriteConversionTests(unittest.TestCase):
     def test_indexed_no_mask_round_trips(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "basi3p02,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "basi3p02,ff9"))
         sprite = sprite_file.sprites[0]
         png_bytes = encode_png(build_png_image(sprite))
         info, rows = decode_png_rows(png_bytes)
@@ -132,7 +136,7 @@ class RealSpriteConversionTests(unittest.TestCase):
         self.assertEqual(rows, [list(row) for row in pixels.rows])
 
     def test_alpha_masked_indexed_sprite_becomes_rgba(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "basi4a08")
         png_bytes = encode_png(build_png_image(sprite))
         info, rows = decode_png_rows(png_bytes)
@@ -142,7 +146,7 @@ class RealSpriteConversionTests(unittest.TestCase):
         self.assertEqual([alpha for _, _, _, alpha in rows[0]], list(mask.rows[0]))
 
     def test_classic_masked_indexed_sprite_uses_colour_key_when_available(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "wavytile,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "wavytile,ff9"))
         sprite = sprite_file.sprites[0]
         image = build_png_image(sprite)
         # tile_1r is a small icon in a 16-colour palette; a free index
@@ -164,7 +168,7 @@ class RealSpriteConversionTests(unittest.TestCase):
                     self.assertEqual(out_index, source_index)
 
     def test_rgb_no_mask_round_trips(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "basi2c08")
         png_bytes = encode_png(build_png_image(sprite))
         info, rows = decode_png_rows(png_bytes)
@@ -174,22 +178,24 @@ class RealSpriteConversionTests(unittest.TestCase):
         self.assertEqual(rows, [list(row) for row in pixels.rows])
 
     def test_alpha_masked_rgb_sprite_becomes_rgba(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "basi6a08")
         png_bytes = encode_png(build_png_image(sprite))
         info, _rows = decode_png_rows(png_bytes)
         self.assertEqual(info["colour_type"], COLOUR_TYPE_RGBA)
 
     def test_16bpp_sprite_gets_sbit_chunk(self) -> None:
-        sprite_file = SpriteFile.parse(ROOT / "sprites" / "manysprites,ff9")
+        sprite_file = SpriteFile.parse(ROOT.joinpath("sprites", "manysprites,ff9"))
         sprite = sprite_named(sprite_file, "32k")
         image = build_png_image(sprite)
         self.assertEqual(image.sbit, (5, 5, 5))
 
 
 class PromotionChainTests(unittest.TestCase):
-    """Exercises the promotion branches that aren't reachable from the
-    small real sample sprites, using synthetic pixel/mask grids."""
+    """
+    Exercises the promotion branches that aren't reachable from the
+    small real sample sprites, using synthetic pixel/mask grids.
+    """
 
     def test_promote_palette_when_1bpp_palette_fully_used(self) -> None:
         from riscos_sprites.png import _build_indexed

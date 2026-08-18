@@ -1,4 +1,5 @@
-"""Command line interface for riscos-sprites.
+"""
+Command line interface for riscos-sprites.
 
 Provides subcommands built on top of the riscos_sprites library:
 
@@ -227,7 +228,7 @@ def _run_extract(args: argparse.Namespace) -> int:
     sprite_file = SpriteFile.parse(args.sprite_file)
     selection = sprite_file.select()
     selection.extract(args.sprite_name, args.output)
-    print(f"Extracted {args.sprite_name} to {args.output}")
+    print("Extracted {0} to {1}".format(args.sprite_name, args.output))
     return 0
 
 
@@ -246,8 +247,8 @@ def _run_to_png(args: argparse.Namespace) -> int:
         )
         args.output.mkdir(parents=True, exist_ok=True)
         for sprite in selection.sprites:
-            sprite_to_png_file(sprite, args.output / f"{sprite.name}.png")
-        print(f"Converted {len(selection.sprites)} sprite(s) to PNG in {args.output}")
+            sprite_to_png_file(sprite, args.output.joinpath("{0}.png".format(sprite.name)))
+        print("Converted {0} sprite(s) to PNG in {1}".format(len(selection.sprites), args.output))
         return 0
 
     if args.sprite_name is None:
@@ -256,7 +257,7 @@ def _run_to_png(args: argparse.Namespace) -> int:
     selection = sprite_file.select()
     sprite = selection.find(args.sprite_name)
     sprite_to_png_file(sprite, args.output)
-    print(f"Converted {args.sprite_name} to {args.output}")
+    print("Converted {0} to {1}".format(args.sprite_name, args.output))
     return 0
 
 
@@ -275,8 +276,10 @@ def _run_to_pnm(args: argparse.Namespace) -> int:
         )
         args.output.mkdir(parents=True, exist_ok=True)
         for sprite in selection.sprites:
-            sprite_to_pnm_file(sprite, args.output / f"{sprite.name}.pnm", indexed=args.indexed)
-        print(f"Converted {len(selection.sprites)} sprite(s) to PNM in {args.output}")
+            sprite_to_pnm_file(
+                sprite, args.output.joinpath("{0}.pnm".format(sprite.name)), indexed=args.indexed
+            )
+        print("Converted {0} sprite(s) to PNM in {1}".format(len(selection.sprites), args.output))
         return 0
 
     if args.sprite_name is None:
@@ -285,13 +288,13 @@ def _run_to_pnm(args: argparse.Namespace) -> int:
     selection = sprite_file.select()
     sprite = selection.find(args.sprite_name)
     sprite_to_pnm_file(sprite, args.output, indexed=args.indexed)
-    print(f"Converted {args.sprite_name} to {args.output}")
+    print("Converted {0} to {1}".format(args.sprite_name, args.output))
     return 0
 
 
 def _run_from_png(args: argparse.Namespace) -> int:
     write_sprite_file_from_png(args.png_files, args.output, name=args.name)
-    print(f"Wrote {len(args.png_files)} sprite(s) to {args.output}")
+    print("Wrote {0} sprite(s) to {1}".format(len(args.png_files), args.output))
     return 0
 
 
@@ -300,5 +303,5 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return args.func(args)
     except (OSError, SpriteFormatError) as exc:
-        print(f"riscos-sprites: {exc}", file=sys.stderr)
+        print("riscos-sprites: {0}".format(exc), file=sys.stderr)
         return 1

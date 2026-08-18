@@ -1,4 +1,5 @@
-"""A minimal PNG reader, just enough for `from-png`.
+"""
+A minimal PNG reader, just enough for `from-png`.
 
 Supports what's needed to round-trip riscos_sprites' own PNG output plus
 ordinary PNGs: IHDR/PLTE/tRNS/pHYs/IDAT, all five filter types, colour
@@ -102,7 +103,7 @@ def _unfilter(raw: bytes, height: int, bytes_per_pixel: int, row_bytes: int) -> 
             elif filter_type == 4:
                 row[i] = (row[i] + _paeth(a, b, c)) & 0xFF
             else:
-                raise SpriteFormatError(f"unsupported PNG filter type: {filter_type}")
+                raise SpriteFormatError("unsupported PNG filter type: {0}".format(filter_type))
         out[row_index * row_bytes : (row_index + 1) * row_bytes] = row
         prev_row = row
     return out
@@ -139,12 +140,14 @@ def decode_png(data: bytes) -> PngImage:
     if interlace != 0:
         raise SpriteFormatError("interlaced PNG files are not supported")
     if colour_type not in _CHANNELS_FOR_COLOUR_TYPE:
-        raise SpriteFormatError(f"unsupported PNG colour type: {colour_type}")
+        raise SpriteFormatError("unsupported PNG colour type: {0}".format(colour_type))
     channels = _CHANNELS_FOR_COLOUR_TYPE[colour_type]
     if colour_type in (COLOUR_TYPE_RGB, COLOUR_TYPE_GRAY_ALPHA, COLOUR_TYPE_RGBA) and bit_depth != 8:
-        raise SpriteFormatError(f"unsupported PNG bit depth {bit_depth} for colour type {colour_type}")
+        raise SpriteFormatError(
+            "unsupported PNG bit depth {0} for colour type {1}".format(bit_depth, colour_type)
+        )
     if bit_depth not in (1, 2, 4, 8):
-        raise SpriteFormatError(f"unsupported PNG bit depth: {bit_depth}")
+        raise SpriteFormatError("unsupported PNG bit depth: {0}".format(bit_depth))
 
     palette = None
     if b"PLTE" in chunks:

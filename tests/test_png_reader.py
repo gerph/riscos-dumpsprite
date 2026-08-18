@@ -83,11 +83,13 @@ def _filter_paeth(row: bytes, prev: bytes, bpp: int) -> bytes:
 
 
 class FilterTypeDecodingTests(unittest.TestCase):
-    """Our own PNG writer always uses filter type 0 (None), so a
+    """
+    Our own PNG writer always uses filter type 0 (None), so a
     round-trip test through it never exercises the other four decoder
     branches. These build minimal PNGs by hand, encoding known raw
     pixel data with each filter type in turn, to check the decoder
-    reconstructs the original bytes regardless of which filter was used."""
+    reconstructs the original bytes regardless of which filter was used.
+    """
 
     def _check_gray_rows(self, raw_rows: list[bytes], filter_type: int, filter_fn) -> None:
         width = len(raw_rows[0])

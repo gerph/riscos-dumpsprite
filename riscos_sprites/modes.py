@@ -1,4 +1,6 @@
-"""Decoding of RISC OS sprite mode words, old-format and new-format alike."""
+"""
+Decoding of RISC OS sprite mode words, old-format and new-format alike.
+"""
 
 from __future__ import annotations
 
@@ -84,7 +86,9 @@ def _tuple_or_none(value: tuple[int, int] | None, index: int) -> int | None:
 
 @dataclass(frozen=True)
 class SpriteMode:
-    """A decoded sprite mode word, old-format or new-format."""
+    """
+    A decoded sprite mode word, old-format or new-format.
+    """
 
     format_name: str
     raw_value: int
@@ -127,11 +131,11 @@ class SpriteMode:
             logical_colours = mode_info.get("logical_colours")
             if pixel and logical_colours:
                 description = (
-                    f"old format, mode {base_mode}, {pixel[0]}x{pixel[1]} pixels, "
-                    f"{logical_colours} logical colours"
-                )
+                    "old format, mode {0}, {1}x{2} pixels, "
+                    "{3} logical colours"
+                ).format(base_mode, pixel[0], pixel[1], logical_colours)
             else:
-                description = f"old format, mode {base_mode}"
+                description = "old format, mode {0}".format(base_mode)
             if shadow_mode:
                 description += ", shadow screen"
             return cls(
@@ -168,11 +172,11 @@ class SpriteMode:
         type_info = NEW_SPRITE_TYPES.get(sprite_type, {})
         x_dpi = (raw_mode >> 1) & 0x1FFF
         y_dpi = (raw_mode >> 14) & 0x1FFF
-        label = type_info.get("name", f"type {sprite_type}")
+        label = type_info.get("name", "type {0}".format(sprite_type))
         if has_alpha:
-            description = f"new format, {label} with alpha channel, {x_dpi}x{y_dpi} dpi"
+            description = "new format, {0} with alpha channel, {1}x{2} dpi".format(label, x_dpi, y_dpi)
         else:
-            description = f"new format, {label}, {x_dpi}x{y_dpi} dpi"
+            description = "new format, {0}, {1}x{2} dpi".format(label, x_dpi, y_dpi)
         return cls(
             format_name="new",
             raw_value=raw_mode,
@@ -218,22 +222,22 @@ class SpriteMode:
     def summary_mode(self) -> str:
         if self.format_name == "old":
             if self.pixel_width is not None and self.pixel_height is not None:
-                return f"{self.mode_number} ({self.pixel_width}x{self.pixel_height})"
+                return "{0} ({1}x{2})".format(self.mode_number, self.pixel_width, self.pixel_height)
             return str(self.mode_number)
         alpha_suffix = "+a" if self.has_alpha else ""
-        return f"type {self.sprite_type}{alpha_suffix}"
+        return "type {0}{1}".format(self.sprite_type, alpha_suffix)
 
     def summary_dpi(self) -> str:
         if self.x_dpi is None or self.y_dpi is None:
             return ""
-        return f"{self.x_dpi}x{self.y_dpi}"
+        return "{0}x{1}".format(self.x_dpi, self.y_dpi)
 
     def summary_type(self) -> str:
         if self.format_name == "old":
             return "old"
-        label = NEW_SPRITE_TYPES.get(self.sprite_type, {}).get("name", f"type {self.sprite_type}")
+        label = NEW_SPRITE_TYPES.get(self.sprite_type, {}).get("name", "type {0}".format(self.sprite_type))
         if self.has_alpha:
-            return f"{label}+a"
+            return "{0}+a".format(label)
         return label
 
     def matches_mode_filter(self, mode_filter: str) -> bool:
@@ -245,7 +249,7 @@ class SpriteMode:
         return mode_filter in {
             str(self.raw_value),
             self.summary_mode(),
-            f"type {self.sprite_type}",
+            "type {0}".format(self.sprite_type),
         }
 
     def matches_type_filter(self, type_filter: str) -> bool:
@@ -256,7 +260,7 @@ class SpriteMode:
         if self.format_name == "old":
             candidates.add("old")
         else:
-            candidates.add(f"type {self.sprite_type}")
+            candidates.add("type {0}".format(self.sprite_type))
         return type_filter.lower() in candidates
 
     def to_dict(self) -> dict[str, object]:
