@@ -160,12 +160,13 @@ frozen dataclasses since they are decoded value records, not things with behavio
   round trips alone wouldn't have tested that code at all. All round trips against the real
   sample sprites produce zero warnings.
 
-- [ ] **Stage 7 — docs and version**
-  Update `README.md` to document `riscos-sprites` and all its subcommands, keep the
-  `riscos-dumpsprites` section, and fix the existing stale "update the version in
-  pyproject.toml" instruction (version now genuinely lives in `pyproject.toml`'s `[project]`
-  table after Stage 1). Bump the package version (new features, per project convention). Final
-  full test run (`python3 -m unittest discover -s tests`).
+- [x] **Stage 7 — docs and version** (done: README documents all five `riscos-sprites`
+  subcommands plus the retained `riscos-dumpsprites`; version bumped to 0.2.0. 86 tests pass;
+  the one pre-existing, unrelated `test_summary_for_wavytile` mismatch — present identically
+  on unmodified master, see Stage 1 — is untouched, out of scope for this plan.)
+
+**All stages complete.** `riscos-sprites` now supports `list`, `extract`, `to-png`, `to-pnm`,
+and `from-png`; `riscos-dumpsprites` is unchanged for existing users.
 
 ## Verification
 
