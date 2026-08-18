@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 import unittest
@@ -102,6 +103,50 @@ class ExtractSubcommandTests(unittest.TestCase):
         result = run_riscos_sprites("extract", "sprites/wavytile,ff9")
         self.assertNotEqual(result.returncode, 0)
         self.assertIn("usage", result.stderr)
+
+
+class ToPngSubcommandTests(unittest.TestCase):
+    def test_converts_a_single_sprite(self) -> None:
+        output_path = ROOT / "tests" / "basi3p02-cli.png"
+        self.addCleanup(lambda: output_path.unlink(missing_ok=True))
+
+        result = run_riscos_sprites(
+            "to-png", "sprites/basi3p02,ff9", "basi3p02", str(output_path)
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Converted basi3p02", result.stdout)
+        self.assertTrue(output_path.exists())
+        with output_path.open("rb") as handle:
+            self.assertEqual(handle.read(8), b"\x89PNG\r\n\x1a\n")
+
+    def test_all_writes_one_png_per_selected_sprite(self) -> None:
+        output_dir = ROOT / "tests" / "to-png-all-cli"
+        self.addCleanup(lambda: shutil.rmtree(output_dir, ignore_errors=True))
+
+        result = run_riscos_sprites(
+            "to-png",
+            "sprites/manysprites,ff9",
+            str(output_dir),
+            "--all",
+            "--name",
+            "basi4*",
+        )
+        self.assertEqual(result.returncode, 0)
+        self.assertIn("Converted 2 sprite(s)", result.stdout)
+        produced = sorted(p.name for p in output_dir.glob("*.png"))
+        self.assertEqual(produced, ["basi4a08.png", "basi4a16.png"])
+
+    def test_all_rejects_a_sprite_name(self) -> None:
+        result = run_riscos_sprites(
+            "to-png", "sprites/wavytile,ff9", "tile_1r", "out-dir", "--all"
+        )
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("does not take a sprite name", result.stderr)
+
+    def test_missing_sprite_name_without_all_is_an_error(self) -> None:
+        result = run_riscos_sprites("to-png", "sprites/wavytile,ff9", "out.png")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("requires a sprite name", result.stderr)
 
 
 if __name__ == "__main__":
