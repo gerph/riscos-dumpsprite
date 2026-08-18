@@ -147,18 +147,18 @@ frozen dataclasses since they are decoded value records, not things with behavio
   to represent them. 12 new tests (6 module-level + 6 CLI). README note on mask-dropping still
   pending until Stage 7.)
 
-- [ ] **Stage 6 — `from-png`**
-  `riscos_sprites/png_reader.py`: minimal PNG chunk reader (IHDR/PLTE/tRNS/IDAT,
-  `zlib.decompress`) — only what's needed to round-trip our own PNG output plus ordinary
-  paletted/RGB/RGBA/grayscale PNGs. `riscos_sprites/from_png.py`: builds a `SpriteFile` from
-  one or more PNGs — paletted PNGs (≤256 colours) become indexed new-format sprites
-  (1/2/4/8bpp chosen by palette size) with `tRNS` becoming a 1bpp or 8bpp-alpha mask; RGB/RGBA
-  PNGs become 32bpp new-format sprites with alpha becoming an 8bpp-alpha mask; grayscale PNGs
-  are promoted to an indexed grey palette. Sprite names come from each PNG's filename stem
-  (validated against the 12-byte sprite-name limit; error if too long, unless a name is given
-  explicitly for the single-PNG case). CLI: `riscos-sprites from-png PNG... OUTPUT_SPRITEFILE`.
-  Add `tests/test_from_png.py`: round-trip existing sample sprites through `to-png` → `from-png`
-  → re-parse and compare pixel/palette/mode data.
+- [x] **Stage 6 — `from-png`** (done substantially as planned. Deviations: true-colour masks
+  always promote straight to an 8bpp alpha mask on the way in — rather than reconstructing
+  ConvertPNG's colour-key search in reverse — since that's not needed for a valid, correct
+  sprite, just a smaller one; indexed sources choose bpp/mask-kind (classic 1bpp vs 8bpp alpha)
+  from the PNG's own bit depth and whether its transparency is purely binary. Along the way,
+  found and fixed a real bug in the pre-existing `_validate()` mask-size check: it didn't
+  distinguish old-format from new-format classic masks, wrongly flagging new-format
+  non-alpha-masked sprites (which `from-png` is the first thing to actually produce) with a
+  bogus size warning. `tests/test_png_reader.py` added alongside to cover the four PNG filter
+  types our own writer never exercises (it always emits type 0), since `test_from_png.py`'s
+  round trips alone wouldn't have tested that code at all. All round trips against the real
+  sample sprites produce zero warnings.
 
 - [ ] **Stage 7 — docs and version**
   Update `README.md` to document `riscos-sprites` and all its subcommands, keep the
