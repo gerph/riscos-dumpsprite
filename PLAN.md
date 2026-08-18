@@ -110,13 +110,20 @@ frozen dataclasses since they are decoded value records, not things with behavio
   end-to-end (subprocess invocation, matching the style of the existing extract/filter tests).
   Done: 10 new tests added, all passing.
 
-- [ ] **Stage 3 — pixel-level decoding and default palettes**
+- [x] **Stage 3 — pixel-level decoding and default palettes**
   Port `default_palette2/4/16/256` from `c/palette` into `riscos_sprites/palette.py`
   (used when a sprite has no embedded palette). Add pixel/mask decoding to `Sprite`: handles
   `packswap` bit order for <8bpp, old-format vs new-format bpp, 16bpp 5:5:5 truecolour with
   bit-replication to 8:8:8, 32bpp RGB, CMYK inverted-byte-order (K,Y,M,C) via `CMYK_TO_RGB`,
   and 1bpp/8bpp-alpha mask decoding aligned to word-padded rows. Add `tests/test_pixels.py`
   with hand-verified pixel values from the existing sample sprites in `sprites/`.
+  Done: implemented as `riscos_sprites/pixels.py` (decode_pixels/decode_mask/cmyk_to_rgb),
+  with `Sprite.decode_pixels()`/`decode_mask()`/`effective_palette()` as the class-level
+  entry points, `Sprite` extended with `image_data`/`mask_data` fields. Verified against real
+  sample sprites: `basi3p02` decodes to the exact PngSuite colour-bar pattern its name
+  implies, and `basi4a08`'s alpha mask decodes to the exact 0..255 gradient PngSuite is known
+  for. No CMYK or reserved/24bpp sample sprites exist in `sprites/`, so those paths are
+  covered only by direct unit tests of `cmyk_to_rgb()`, not a real-sprite round trip.
 
 - [ ] **Stage 4 — `to-png`**
   `riscos_sprites/png.py`: hand-rolled PNG writer (IHDR/PLTE/tRNS/pHYs/tEXt/sBIT/IDAT via
