@@ -88,14 +88,20 @@ frozen dataclasses since they are decoded value records, not things with behavio
   Create `sprites-png-conversion` branch in the `riscos-dumpsprites` repo; add `PLAN.md`
   (this plan) at the repo root; commit.
 
-- [ ] **Stage 1 — extract `riscos_sprites` package, zero behaviour change**
+- [x] **Stage 1 — extract `riscos_sprites` package, zero behaviour change**
   Move parsing/validation/reporting logic out of `riscos_dumpsprites/cli.py` into the
   `riscos_sprites` submodules above, converting `Sprite`/`SpriteFile` into classes with methods.
   `riscos_dumpsprites/cli.py` becomes a thin shim producing byte-identical output to today.
   Update `pyproject.toml` to a full `[project]` table covering both packages, single
   `riscos-dumpsprites` console script (as today).
   **Verification:** existing `tests/test_cli.py` passes unmodified with no edits to its
-  expectations.
+  expectations. Done: report-building logic became methods on `Sprite`/`SpriteSelection`
+  rather than a separate `reporting.py` module of free functions, to keep with "methods for
+  the operations we perform on them". 13/14 tests pass; the 14th failure is a pre-existing
+  mismatch on unmodified master (`test_summary_for_wavytile` expects `"27 640x480"` but
+  `summary_mode()` has always produced `"27 (640x480)"`), unrelated to this refactor and left
+  as-is (out of scope for this plan). `setup.py` removed; metadata now lives in
+  `pyproject.toml`'s `[project]` table.
 
 - [ ] **Stage 2 — `riscos-sprites` CLI with `list` and `extract`**
   Add `riscos_sprites/cli.py` with argparse subparsers `list` (mirrors all current
