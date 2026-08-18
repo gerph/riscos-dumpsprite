@@ -8,7 +8,10 @@ from pathlib import Path
 
 from .errors import SpriteFormatError
 from .modes import NEW_SPRITE_TYPES, SpriteMode
-from .palette import PaletteEntry
+from .palette import PaletteEntry, default_palette_entries
+from .pixels import DecodedMask, DecodedPixels
+from .pixels import decode_mask as _decode_mask
+from .pixels import decode_pixels as _decode_pixels
 
 SPRITE_HEADER_SIZE = 44
 
@@ -76,6 +79,8 @@ class Sprite:
     mask_offset: int
     image_bytes: int
     mask_bytes: int
+    image_data: bytes
+    mask_data: bytes
     palette_bytes: int
     palette_entries: int
     palette: tuple[PaletteEntry, ...]
@@ -120,6 +125,12 @@ class Sprite:
         has_mask = mask_offset != image_offset
         image_bytes = (mask_offset if has_mask else next_offset) - image_offset
         mask_bytes = next_offset - mask_offset if has_mask else 0
+        image_data = data[sprite_offset + image_offset : sprite_offset + image_offset + image_bytes]
+        mask_data = (
+            data[sprite_offset + mask_offset : sprite_offset + mask_offset + mask_bytes]
+            if has_mask
+            else b""
+        )
         width_pixels = _compute_width_pixels(width_words, first_bit_used, last_bit_used, mode.bpp)
         warnings = _validate(
             name=name,
@@ -148,6 +159,8 @@ class Sprite:
             mask_offset=mask_offset,
             image_bytes=image_bytes,
             mask_bytes=mask_bytes,
+            image_data=image_data,
+            mask_data=mask_data,
             palette_bytes=palette_bytes,
             palette_entries=palette_bytes // 8,
             palette=palette,
@@ -155,6 +168,48 @@ class Sprite:
             mode=mode,
             width_pixels=width_pixels,
             warnings=tuple(warnings),
+        )
+
+    def effective_palette(self) -> tuple[PaletteEntry, ...]:
+        """The sprite's own palette, or the standard default palette for
+        its bits-per-pixel if it has none of its own."""
+        if self.palette:
+            return self.palette
+        if self.mode.data_format in {"monochrome", "indexed"} and self.mode.bpp is not None:
+            return default_palette_entries(self.mode.bpp)
+        return ()
+
+    def decode_pixels(self) -> DecodedPixels:
+        if self.width_pixels is None:
+            raise SpriteFormatError(f"{self.name}: cannot decode pixels without a known pixel width")
+        if self.mode.bpp is None:
+            raise SpriteFormatError(f"{self.name}: cannot decode pixels without a known bits-per-pixel")
+        if self.mode.data_format is None:
+            raise SpriteFormatError(f"{self.name}: cannot decode pixels without a known data format")
+        return _decode_pixels(
+            image_bytes=self.image_data,
+            width_words=self.width_words,
+            height=self.height,
+            first_bit_used=self.first_bit_used,
+            width_pixels=self.width_pixels,
+            bpp=self.mode.bpp,
+            data_format=self.mode.data_format,
+        )
+
+    def decode_mask(self) -> DecodedMask | None:
+        if not self.has_mask:
+            return None
+        if self.width_pixels is None:
+            raise SpriteFormatError(f"{self.name}: cannot decode mask without a known pixel width")
+        if self.mode.mask_kind is None:
+            raise SpriteFormatError(f"{self.name}: cannot decode mask without a known mask kind")
+        return _decode_mask(
+            mask_bytes=self.mask_data,
+            height=self.height,
+            width_pixels=self.width_pixels,
+            first_bit_used=self.first_bit_used,
+            mask_kind=self.mode.mask_kind,
+            image_width_words=self.width_words,
         )
 
     def summary_mask(self) -> str:
