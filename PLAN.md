@@ -103,11 +103,12 @@ frozen dataclasses since they are decoded value records, not things with behavio
   as-is (out of scope for this plan). `setup.py` removed; metadata now lives in
   `pyproject.toml`'s `[project]` table.
 
-- [ ] **Stage 2 — `riscos-sprites` CLI with `list` and `extract`**
+- [x] **Stage 2 — `riscos-sprites` CLI with `list` and `extract`**
   Add `riscos_sprites/cli.py` with argparse subparsers `list` (mirrors all current
   inspection flags) and `extract SPRITE_FILE SPRITE_NAME OUTPUT`. Add `riscos-sprites` console
   script + root launcher script. Add `tests/test_sprites_cli.py` covering both subcommands
   end-to-end (subprocess invocation, matching the style of the existing extract/filter tests).
+  Done: 10 new tests added, all passing.
 
 - [ ] **Stage 3 — pixel-level decoding and default palettes**
   Port `default_palette2/4/16/256` from `c/palette` into `riscos_sprites/palette.py`
